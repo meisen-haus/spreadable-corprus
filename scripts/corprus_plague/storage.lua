@@ -8,6 +8,7 @@ local state = {
     infections = {},
     transformed = {},
     pendingTransforms = {},
+    firstRestDreamTriggered = false,
 }
 
 local legacySection = storage.globalSection(config.storageSection)
@@ -93,10 +94,19 @@ function M.clearAllPendingTransforms()
     state.pendingTransforms = {}
 end
 
+function M.hasFirstRestDreamTriggered()
+    return state.firstRestDreamTriggered == true
+end
+
+function M.markFirstRestDreamTriggered()
+    state.firstRestDreamTriggered = true
+end
+
 function M.clearAll()
     state.infections = {}
     state.transformed = {}
     state.pendingTransforms = {}
+    state.firstRestDreamTriggered = false
 end
 
 function M.exportForSave()
@@ -104,6 +114,7 @@ function M.exportForSave()
         version = SAVE_VERSION,
         infections = copyTable(state.infections),
         transformed = copyTable(state.transformed),
+        firstRestDreamTriggered = state.firstRestDreamTriggered,
     }
 end
 
@@ -127,6 +138,7 @@ function M.importFromSave(savedData)
         if type(savedData.transformed) == 'table' then
             state.transformed = copyTable(savedData.transformed)
         end
+        state.firstRestDreamTriggered = savedData.firstRestDreamTriggered == true
     end
 end
 

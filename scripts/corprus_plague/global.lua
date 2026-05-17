@@ -5,6 +5,7 @@ local storageApi = require('scripts.corprus_plague.storage')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local config = require('scripts.corprus_plague.config')
 local settings = require('scripts.corprus_plague.settings')
+local firstRestDream = require('scripts.corprus_plague.first_rest_dream')
 
 settings.registerGroup()
 
@@ -69,6 +70,10 @@ return {
             if not storageApi.isInfected(plagueKey) and not storageApi.isTransformed(plagueKey) then
                 storageApi.markInfected(plagueKey, world.getGameTime())
             end
+        end,
+
+        CorprusPlagueFirstRestDream = function(data)
+            firstRestDream.trigger(data)
         end,
     },
 }

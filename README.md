@@ -27,6 +27,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 ## Main features
 
 - **Spreadable Corprus** — permanent player ability; active effect notes that NPCs you talk to contract Corprus.
+- **First-rest nightmare** — the first interior rest shows a disturbing dream and wakes you near a Corprus Stalker.
 - **Dialogue infection** — speaking with an NPC (topics, greetings, persuasion, voice, journal) infects them if they are eligible.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Plague → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame.
