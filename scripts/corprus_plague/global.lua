@@ -4,6 +4,7 @@ local carrier = require('scripts.corprus_plague.carrier')
 local storageApi = require('scripts.corprus_plague.storage')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local config = require('scripts.corprus_plague.config')
+local disposition = require('scripts.corprus_plague.disposition')
 local settings = require('scripts.corprus_plague.settings')
 
 settings.registerGroup()
@@ -22,6 +23,10 @@ local function syncAllPlayerCarrierStats()
     for _, player in ipairs(world.players) do
         carrier.syncInfectionCount(player, infectionCount)
     end
+end
+
+local function getPrimaryPlayer()
+    return world.players[1]
 end
 
 local function onGameReady()
@@ -73,6 +78,7 @@ return {
                 if transform.infect(actor) then
                     syncAllPlayerCarrierStats()
                 end
+                disposition.applyInfectionPenalty(actor, getPrimaryPlayer())
                 return
             end
 

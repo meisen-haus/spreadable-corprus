@@ -55,6 +55,9 @@ return {
     -- Set true for ONE load to wipe bad infection/transform records from earlier tests, then set false.
     clearPlagueDataOnLoad = false,
 
+    -- Base disposition lost with NPCs for each unique infection in the current save.
+    dispositionPenaltyPerInfection = 0.5,
+
     -- How often to check active NPCs for transformation (seconds of simulation time).
     transformScanInterval = 5,
 
