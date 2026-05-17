@@ -29,7 +29,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Spreadable Corprus** — permanent player ability; active effect notes that NPCs you talk to contract Corprus.
 - **Dialogue infection** — speaking with an NPC (topics, greetings, persuasion, voice, journal) infects them if they are eligible.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Plague → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
-- **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame.
+- **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame. A one-shot Corprus-style VFX plays on the spawned creature.
 - **Loot and identity** — Corprus keeps the NPC’s display name where possible; inventory is moved to the creature.
 - **Immunities** — Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — prophecy message when an essential NPC transforms.

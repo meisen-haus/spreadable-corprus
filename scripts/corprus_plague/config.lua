@@ -58,6 +58,13 @@ return {
     -- How often to check active NPCs for transformation (seconds of simulation time).
     transformScanInterval = 5,
 
+    -- Magic effects to use as visual templates when a transformed Corprus spawns.
+    spawnVfxMagicEffectIds = {
+        'corprus',
+        'blightdisease',
+    },
+    spawnVfxId = 'spreadable_corprus_spawn_vfx',
+
     transformCreatures = {
         { id = 'corprus_stalker', weight = 70 },
         { id = 'corprus_lame', weight = 30 },
