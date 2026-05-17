@@ -1,0 +1,6 @@
+# Corprus Plague — OpenMW 0.51+ Lua mod
+# LOAD must be first: openmw.content only works in load-context scripts.
+
+LOAD: scripts/corprus_plague/content_register.lua
+GLOBAL: scripts/corprus_plague/global.lua
+PLAYER: scripts/corprus_plague/player.lua

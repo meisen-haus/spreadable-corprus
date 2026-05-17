@@ -1,0 +1,7 @@
+# Environment variables
+.env
+.env.*
+
+# Markdown (keep README.md tracked)
+*.md
+!README.md
