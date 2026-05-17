@@ -7,6 +7,22 @@ local function idSet(ids)
     return set
 end
 
+local function valueMap(ids, value)
+    local map = {}
+    for _, id in ipairs(ids) do
+        map[id] = value
+    end
+    return map
+end
+
+local function appendAll(target, source)
+    for _, value in ipairs(source) do
+        target[#target + 1] = value
+    end
+end
+
+local strangeNightmareDialogueChoicePlaceholder = 'TODO: strange nightmare dialogue choice.'
+
 -- Sleepers Awake victims (UESP: Morrowind:Sleepers_Awake) plus Sixth House faction NPCs.
 local sleeperAndHouseNpcIds = {
     -- Sixth House faction (Category:Morrowind-Factions-Sixth House)
@@ -32,6 +48,15 @@ local sleeperAndHouseNpcIds = {
     'vireveri darethran',
     'vivyne andrano',
 }
+
+local immuneNpcIds = {
+    'vivec_god',
+    'yagrum bagarn',
+}
+
+local strangeNightmareDialogueNpcIds = {}
+appendAll(strangeNightmareDialogueNpcIds, immuneNpcIds)
+appendAll(strangeNightmareDialogueNpcIds, sleeperAndHouseNpcIds)
 
 return {
     storageSection = 'corprus_plague',
@@ -64,10 +89,7 @@ return {
     },
 
     -- Only the living god form, not other Vivec-related NPCs.
-    immuneRecordIds = idSet({
-        'vivec_god',
-        'yagrum bagarn',
-    }),
+    immuneRecordIds = idSet(immuneNpcIds),
 
     -- Faction membership checked at runtime via types.NPC.getFactions.
     immuneFactions = idSet({
@@ -80,4 +102,10 @@ return {
     }),
 
     immuneSleeperRecordIds = idSet(sleeperAndHouseNpcIds),
+
+    -- Placeholder choices for explicitly listed NPCs that are excluded from infection.
+    strangeNightmareDialogueChoices = valueMap(
+        strangeNightmareDialogueNpcIds,
+        strangeNightmareDialogueChoicePlaceholder
+    ),
 }
