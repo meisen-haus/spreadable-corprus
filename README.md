@@ -34,6 +34,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Immunities** — Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — prophecy message when an essential NPC transforms.
 - **Per-save tracking** — infection and transform lists are written into each save file; after reload, transformed NPCs stay disabled when their cell loads.
+- **Infection statistic** — each save tracks the total number of unique NPCs infected, even after they transform.
 
 ## Requirements
 
