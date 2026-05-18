@@ -19,8 +19,7 @@ content.magicEffects.records[config.carrierEffectId] = {
     icon = iconTemplate and iconTemplate.icon or effectTemplate.icon,
 }
 
--- Seed with magnitude 1 so the effect appears in Magic > Active Effects.
--- carrier.lua overwrites the live magnitude with the per-save infection count.
+-- Base template; carrier.lua creates per-save variants whose magnitude is the infection count.
 content.spells.records[config.carrierSpellId] = {
     name = config.carrierSpellName,
     type = content.spells.TYPE.Ability,
@@ -29,8 +28,8 @@ content.spells.records[config.carrierSpellId] = {
             id = config.carrierEffectId,
             range = content.RANGE.Self,
             duration = 0,
-            magnitudeMin = 1,
-            magnitudeMax = 1,
+            magnitudeMin = 0,
+            magnitudeMax = 0,
         },
     },
 }
