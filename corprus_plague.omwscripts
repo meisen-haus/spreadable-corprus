@@ -1,4 +1,4 @@
-# Corprus Plague — OpenMW 0.51+ Lua mod
+# Spreadable Corprus (Pandemic) — OpenMW 0.51+ Lua mod
 # LOAD must be first: openmw.content only works in load-context scripts.
 
 LOAD: scripts/corprus_plague/content_register.lua

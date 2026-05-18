@@ -52,6 +52,11 @@ return {
     minIncubationDays = 1,
     maxIncubationDays = 21,
 
+    defaultDispositionModifier = 0.5,
+    minDispositionModifier = 0,
+    maxDispositionModifier = 2,
+    dispositionModifierStep = 0.1,
+
     -- Set true for ONE load to wipe bad infection/transform records from earlier tests, then set false.
     clearPlagueDataOnLoad = false,
 
