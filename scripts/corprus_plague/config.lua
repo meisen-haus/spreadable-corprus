@@ -37,7 +37,7 @@ return {
     storageSection = 'corprus_plague',
 
     -- Registered in content_register.lua (LOAD context, OpenMW 0.51+).
-    carrierSpellId = 'spreadable corprus',
+    carrierSpellId = 'corprus_plague_pandemic',
     carrierSpellName = 'Pandemic',
     carrierEffectId = 'spreadable_corprus_marker',
     carrierEffectName = 'Divine Disease Carrier',

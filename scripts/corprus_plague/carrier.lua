@@ -7,6 +7,7 @@ local M = {}
 -- Older builds used these instead of the custom carrier ability.
 local legacyCarrierSpellIds = {
     'corprus immunity',
+    'spreadable corprus',
 }
 
 local function hasSpell(player, spellId)
@@ -16,6 +17,34 @@ local function hasSpell(player, spellId)
         end
     end
     return false
+end
+
+local function removeSpell(spells, spellId)
+    pcall(function()
+        spells:remove(spellId)
+    end)
+end
+
+local function removeActiveSpellInstances(player, spellId)
+    local ok, activeSpells = pcall(function()
+        return types.Actor.activeSpells(player)
+    end)
+    if not ok or not activeSpells then
+        return
+    end
+
+    local activeSpellIds = {}
+    for _, activeSpell in pairs(activeSpells) do
+        if activeSpell.id == spellId and activeSpell.activeSpellId ~= nil then
+            activeSpellIds[#activeSpellIds + 1] = activeSpell.activeSpellId
+        end
+    end
+
+    for _, activeSpellId in ipairs(activeSpellIds) do
+        pcall(function()
+            activeSpells:remove(activeSpellId)
+        end)
+    end
 end
 
 local function normalizeInfectionCount(infectionCount)
@@ -46,14 +75,16 @@ function M.ensure(player, infectionCount)
     local spells = types.Actor.spells(player)
 
     for _, legacyId in ipairs(legacyCarrierSpellIds) do
+        removeActiveSpellInstances(player, legacyId)
         if hasSpell(player, legacyId) then
-            spells:remove(legacyId)
+            removeSpell(spells, legacyId)
         end
     end
 
     -- Re-apply each time so updated effect definitions replace stale active instances.
+    removeActiveSpellInstances(player, config.carrierSpellId)
     if hasSpell(player, config.carrierSpellId) then
-        spells:remove(config.carrierSpellId)
+        removeSpell(spells, config.carrierSpellId)
     end
     spells:add(config.carrierSpellId)
     M.syncInfectionCount(player, infectionCount)
