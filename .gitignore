@@ -2,6 +2,7 @@
 .env
 .env.*
 
-# Markdown (keep README.md tracked)
+# Markdown (keep project docs tracked)
 *.md
 !README.md
+!CHANGELOG.md

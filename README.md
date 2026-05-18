@@ -24,6 +24,8 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 
 No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders.
 
+**Upgrading:** If an older build granted **Spreadable Corprus** (fixed **1 pt** in Magic), load the save once with this version—the legacy ability is removed and **Pandemic** is applied with the correct count. See [CHANGELOG.md](CHANGELOG.md) for save-format and UI details.
+
 ## Main features
 
 - **Pandemic** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
@@ -34,7 +36,11 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Immunities** — Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — prophecy message when an essential NPC transforms.
 - **Per-save tracking** — infection and transform lists are written into each save file; after reload, transformed NPCs stay disabled when their cell loads.
-- **Infection statistic** — each save tracks the total number of unique NPCs infected, even after they transform, and mirrors it in Magic → Active Effects.
+- **Infection statistic** — each save tracks the total number of unique NPCs infected (by stable actor identity, not display name), even after they transform; the count appears in **Magic → Active Effects** as **Pandemic - N pts**.
+
+## Changelog
+
+Release notes: [CHANGELOG.md](CHANGELOG.md).
 
 ## Requirements
 
