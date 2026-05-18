@@ -20,7 +20,7 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 3. Place that folder on your OpenMW **data path**—for example next to other mods:
    - `...\OpenMW 0.51.0\data\spreadable-corprus\`
 4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod).
-5. Launch the game. On a new or existing save, you should receive the **Spreadable Corprus** ability shortly after loading.
+5. Launch the game. On a new or existing save, you should receive the **Divine Disease Carrier** ability shortly after loading.
 
 No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders.
 
