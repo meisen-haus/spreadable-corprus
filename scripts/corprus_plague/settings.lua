@@ -11,8 +11,8 @@ local dispositionModifierSteps = math.floor(
     (config.maxDispositionModifier - config.minDispositionModifier) / config.dispositionModifierStep + 0.5
 )
 for step = 0, dispositionModifierSteps do
-    dispositionModifierItems[#dispositionModifierItems + 1] =
-        config.minDispositionModifier + step * config.dispositionModifierStep
+    local value = config.minDispositionModifier + step * config.dispositionModifierStep
+    dispositionModifierItems[#dispositionModifierItems + 1] = math.floor(value * 10 + 0.5) / 10
 end
 
 local M = {}

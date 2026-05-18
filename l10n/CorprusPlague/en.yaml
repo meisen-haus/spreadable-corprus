@@ -8,7 +8,7 @@ incubationDays: "Incubation period (days)"
 incubationDaysDescription: "In-game days after interaction with player before an NPC becomes Corprus creature. Range 1–21."
 
 dispositionModifier: "Disposition modifier"
-dispositionModifierDescription: "For each pt of Pandemic, modify base disposition by:"
+dispositionModifierDescription: "For each pt of Pandemic, modify base disposition by: (Off = 0, no penalty)"
 
 "1": "1 day"
 "2": "2 days"

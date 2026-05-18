@@ -5,6 +5,9 @@ local M = {}
 
 local function clampModifier(value)
     if type(value) ~= 'number' then
+        value = tonumber(value)
+    end
+    if value == nil then
         return config.defaultDispositionModifier
     end
     value = math.floor(value * 10 + 0.5) / 10
@@ -18,7 +21,11 @@ local function clampModifier(value)
 end
 
 function M.getPerInfection()
-    return clampModifier(storage.globalSection(config.settingsGroupKey):get('dispositionModifier'))
+    local value = storage.globalSection(config.settingsGroupKey):get('dispositionModifier')
+    if value == nil then
+        return config.defaultDispositionModifier
+    end
+    return clampModifier(value)
 end
 
 return M
