@@ -20,13 +20,13 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 3. Place that folder on your OpenMW **data path**—for example next to other mods:
    - `...\OpenMW 0.51.0\data\spreadable-corprus\`
 4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod).
-5. Launch the game. On a new or existing save, you should receive the **Divine Disease Carrier** ability shortly after loading.
+5. Launch the game. On a new or existing save, you should receive the **Pandemic** ability shortly after loading.
 
 No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders.
 
 ## Main features
 
-- **Divine Disease Carrier** — permanent player ability; active effect shows **Infections - N pts** for the number of unique NPCs infected in this save.
+- **Pandemic** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
 - **Dialogue infection** — speaking with an NPC (topics, greetings, persuasion, voice, journal) infects them if they are eligible.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Plague → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame.
