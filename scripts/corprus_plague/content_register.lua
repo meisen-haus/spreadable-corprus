@@ -14,12 +14,13 @@ local iconTemplate = content.magicEffects.records['corprus']
 
 content.magicEffects.records[config.carrierEffectId] = {
     template = effectTemplate,
-    name = config.carrierEffectDescription,
+    name = config.carrierEffectName,
     harmful = false,
     icon = iconTemplate and iconTemplate.icon or effectTemplate.icon,
 }
 
--- Magnitude 1 so the effect appears in Magic > Active Effects (0-magnitude effects are hidden).
+-- Seed with magnitude 1 so the effect appears in Magic > Active Effects.
+-- carrier.lua overwrites the live magnitude with the per-save infection count.
 content.spells.records[config.carrierSpellId] = {
     name = config.carrierSpellName,
     type = content.spells.TYPE.Ability,

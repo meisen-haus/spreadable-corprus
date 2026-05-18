@@ -92,10 +92,11 @@ end
 
 function M.markInfected(plagueKey, gameTime)
     if not plagueKey then
-        return
+        return false
     end
-    trackUniqueInfection(plagueKey)
+    local wasNew = trackUniqueInfection(plagueKey)
     state.infections[plagueKey] = { infectedAt = gameTime }
+    return wasNew
 end
 
 function M.clearInfection(plagueKey)
@@ -122,12 +123,13 @@ end
 
 function M.markTransformed(plagueKey, entry)
     if not plagueKey then
-        return
+        return false
     end
-    trackUniqueInfection(plagueKey)
+    local wasNew = trackUniqueInfection(plagueKey)
     M.clearInfection(plagueKey)
     M.releaseTransform(plagueKey)
     state.transformed[plagueKey] = entry or {}
+    return wasNew
 end
 
 function M.getInfectionCount()

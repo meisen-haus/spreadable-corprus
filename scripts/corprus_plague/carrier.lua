@@ -18,7 +18,24 @@ local function hasSpell(player, spellId)
     return false
 end
 
-function M.ensure(player)
+local function normalizeInfectionCount(infectionCount)
+    infectionCount = tonumber(infectionCount) or 0
+    if infectionCount < 0 then
+        return 0
+    end
+    return math.floor(infectionCount)
+end
+
+function M.syncInfectionCount(player, infectionCount)
+    if not player or not player:isValid() then
+        return
+    end
+
+    local activeEffects = types.Actor.activeEffects(player)
+    activeEffects:set(normalizeInfectionCount(infectionCount), config.carrierEffectId)
+end
+
+function M.ensure(player, infectionCount)
     if not player or not player:isValid() then
         return
     end
@@ -39,6 +56,7 @@ function M.ensure(player)
         spells:remove(config.carrierSpellId)
     end
     spells:add(config.carrierSpellId)
+    M.syncInfectionCount(player, infectionCount)
 end
 
 return M
