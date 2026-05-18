@@ -20,13 +20,15 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 3. Place that folder on your OpenMW **data path**—for example next to other mods:
    - `...\OpenMW 0.51.0\data\spreadable-corprus\`
 4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod).
-5. Launch the game. On a new or existing save, you should receive the **Spreadable Corprus** ability shortly after loading.
+5. Launch the game. On a new or existing save, you should receive the **Pandemic** ability shortly after loading.
 
 No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders.
 
+**Upgrading:** If an older build granted **Spreadable Corprus** (fixed **1 pt** in Magic), load the save once with this version—the legacy ability is removed and **Pandemic** is applied with the correct count. See [CHANGELOG.md](CHANGELOG.md) for save-format and UI details.
+
 ## Main features
 
-- **Spreadable Corprus** — permanent player ability; active effect notes that NPCs you talk to contract Corprus.
+- **Pandemic** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
 - **Dialogue infection** — speaking with an NPC (topics, greetings, persuasion, voice, journal) infects them if they are eligible.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Plague → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame.
@@ -34,6 +36,11 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Immunities** — Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — prophecy message when an essential NPC transforms.
 - **Per-save tracking** — infection and transform lists are written into each save file; after reload, transformed NPCs stay disabled when their cell loads.
+- **Infection statistic** — each save tracks the total number of unique NPCs infected (by stable actor identity, not display name), even after they transform; the count appears in **Magic → Active Effects** as **Pandemic - N pts**.
+
+## Changelog
+
+Release notes: [CHANGELOG.md](CHANGELOG.md).
 
 ## Requirements
 

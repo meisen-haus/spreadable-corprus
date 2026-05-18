@@ -37,10 +37,10 @@ return {
     storageSection = 'corprus_plague',
 
     -- Registered in content_register.lua (LOAD context, OpenMW 0.51+).
-    carrierSpellId = 'spreadable corprus',
-    carrierSpellName = 'Spreadable Corprus',
+    carrierSpellId = 'corprus_plague_pandemic',
+    carrierSpellName = 'Pandemic',
     carrierEffectId = 'spreadable_corprus_marker',
-    carrierEffectDescription = 'NPCs you talk to contract corprus',
+    carrierEffectName = 'Divine Disease Carrier',
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,

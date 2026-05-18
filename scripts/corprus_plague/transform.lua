@@ -132,8 +132,7 @@ function M.infect(actor)
         return false
     end
 
-    storageApi.markInfected(plagueKey, world.getGameTime())
-    return true
+    return storageApi.markInfected(plagueKey, world.getGameTime())
 end
 
 function M.tryTransformActiveActors()

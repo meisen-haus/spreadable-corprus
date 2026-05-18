@@ -11,8 +11,16 @@ settings.registerGroup()
 local scanAccumulator = 0
 
 local function ensureAllPlayers()
+    local infectionCount = storageApi.getInfectionCount()
     for _, player in ipairs(world.players) do
-        carrier.ensure(player)
+        carrier.ensure(player, infectionCount)
+    end
+end
+
+local function syncAllPlayerCarrierStats()
+    local infectionCount = storageApi.getInfectionCount()
+    for _, player in ipairs(world.players) do
+        carrier.syncInfectionCount(player, infectionCount)
     end
 end
 
@@ -62,12 +70,16 @@ return {
 
             local actor = actorRef.findActor(plagueKey)
             if actor and actor:isValid() then
-                transform.infect(actor)
+                if transform.infect(actor) then
+                    syncAllPlayerCarrierStats()
+                end
                 return
             end
 
             if not storageApi.isInfected(plagueKey) and not storageApi.isTransformed(plagueKey) then
-                storageApi.markInfected(plagueKey, world.getGameTime())
+                if storageApi.markInfected(plagueKey, world.getGameTime()) then
+                    syncAllPlayerCarrierStats()
+                end
             end
         end,
     },
