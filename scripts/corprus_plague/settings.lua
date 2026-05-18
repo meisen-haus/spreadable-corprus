@@ -6,6 +6,15 @@ for day = config.minIncubationDays, config.maxIncubationDays do
     dayItems[#dayItems + 1] = day
 end
 
+local dispositionModifierItems = {}
+local dispositionModifierSteps = math.floor(
+    (config.maxDispositionModifier - config.minDispositionModifier) / config.dispositionModifierStep + 0.5
+)
+for step = 0, dispositionModifierSteps do
+    dispositionModifierItems[#dispositionModifierItems + 1] =
+        config.minDispositionModifier + step * config.dispositionModifierStep
+end
+
 local M = {}
 
 function M.registerPage()
@@ -22,8 +31,8 @@ function M.registerGroup()
         key = config.settingsGroupKey,
         page = config.settingsPageKey,
         l10n = 'CorprusPlague',
-        name = 'plagueSettings',
-        description = 'plagueSettingsDescription',
+        name = 'pandemicSettings',
+        description = 'pandemicSettingsDescription',
         permanentStorage = false,
         order = 0,
         settings = {
@@ -36,6 +45,17 @@ function M.registerGroup()
                 argument = {
                     l10n = 'CorprusPlague',
                     items = dayItems,
+                },
+            },
+            {
+                key = 'dispositionModifier',
+                renderer = 'select',
+                name = 'dispositionModifier',
+                description = 'dispositionModifierDescription',
+                default = config.defaultDispositionModifier,
+                argument = {
+                    l10n = 'CorprusPlagueDisposition',
+                    items = dispositionModifierItems,
                 },
             },
         },

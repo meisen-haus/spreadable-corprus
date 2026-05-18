@@ -78,7 +78,7 @@ return {
                 if transform.infect(actor) then
                     syncAllPlayerCarrierStats()
                 end
-                disposition.applyInfectionPenalty(actor, getPrimaryPlayer())
+                disposition.applyInfectionPenalty(actor, data.player or getPrimaryPlayer())
                 return
             end
 

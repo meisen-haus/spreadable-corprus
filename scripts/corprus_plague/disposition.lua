@@ -1,5 +1,5 @@
 local types = require('openmw.types')
-local config = require('scripts.corprus_plague.config')
+local dispositionModifier = require('scripts.corprus_plague.disposition_modifier')
 local storageApi = require('scripts.corprus_plague.storage')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 
@@ -10,7 +10,7 @@ local function targetPenalty()
     if infections <= 0 then
         return 0
     end
-    return infections * config.dispositionPenaltyPerInfection
+    return infections * dispositionModifier.getPerInfection()
 end
 
 function M.applyInfectionPenalty(actor, player)

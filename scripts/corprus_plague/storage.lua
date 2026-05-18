@@ -186,7 +186,7 @@ function M.exportForSave()
     }
 end
 
--- Wipe obsolete Persistent bucket (plague data is per-save via global.lua onSave/onLoad).
+-- Wipe obsolete Persistent bucket (Pandemic data is per-save via global.lua onSave/onLoad).
 function M.purgeLegacyPersistent()
     legacySection:reset({})
 end

@@ -1,4 +1,4 @@
--- Plague keys must be computable from the player script (no openmw.world here).
+-- Actor identity keys must be computable from the player script (no openmw.world here).
 local M = {}
 
 local function positionTuple(position)
@@ -54,7 +54,6 @@ function M.findActor(plagueKey)
         if ok and obj and obj:isValid() then
             return obj
         end
-        return nil
     end
 
     for _, actor in ipairs(world.activeActors) do

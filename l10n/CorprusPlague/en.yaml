@@ -1,11 +1,14 @@
 CorprusPlague: "Spreadable Corprus"
-settingsPageDescription: "Plague mod options. Infection count is shown in Magic (Pandemic - N pts); only incubation is configurable here."
+settingsPageDescription: "Pandemic options. Infection count is shown in Magic (Pandemic - N pts)."
 
-plagueSettings: "Plague"
-plagueSettingsDescription: "How long infected NPCs take to transform after dialogue infection."
+pandemicSettings: "Pandemic"
+pandemicSettingsDescription: "Incubation time and how the spread of the pandemic affects NPC disposition toward you."
 
 incubationDays: "Incubation period (days)"
-incubationDaysDescription: "In-game days after dialogue infection before an NPC becomes corprus. Range 1–21."
+incubationDaysDescription: "In-game days after interaction with player before an NPC becomes Corprus creature. Range 1–21."
+
+dispositionModifier: "Disposition modifier"
+dispositionModifierDescription: "For each pt of Pandemic, modify base disposition by:"
 
 "1": "1 day"
 "2": "2 days"

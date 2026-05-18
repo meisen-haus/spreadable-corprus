@@ -30,9 +30,9 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 
 - **Pandemic** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
 - **Dialogue infection** — speaking with an NPC (topics, greetings, persuasion, voice, journal) infects them if they are eligible.
-- **Configurable incubation period** — **Settings → Spreadable Corprus → Plague → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
+- **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame.
-- **Disposition penalty** — NPCs you speak with lose **0.5** base disposition toward you for each unique infection recorded in the save.
+- **Disposition modifier** — NPCs you speak with lose base disposition toward you for each Pandemic pt (default **0.5** per pt; **0–2** in **Settings → Spreadable Corprus → Pandemic**).
 - **Loot and identity** — Corprus keeps the NPC’s display name where possible; inventory is moved to the creature.
 - **Immunities** — Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — prophecy message when an essential NPC transforms.
