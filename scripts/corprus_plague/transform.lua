@@ -7,6 +7,7 @@ local actorRef = require('scripts.corprus_plague.actor_ref')
 local inventory = require('scripts.corprus_plague.inventory')
 local prophecy = require('scripts.corprus_plague.prophecy')
 local spawnCreature = require('scripts.corprus_plague.spawn_creature')
+local spawnVfx = require('scripts.corprus_plague.spawn_vfx')
 local disableActor = require('scripts.corprus_plague.disable_actor')
 
 local M = {}
@@ -102,6 +103,8 @@ function M.tryTransform(actor)
         if not creature:isValid() then
             error('corprus not in world after teleport')
         end
+
+        spawnVfx.play(creature)
 
         inventory.transferActorLoot(actor, creature)
 
