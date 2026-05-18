@@ -1,4 +1,5 @@
 local core = require('openmw.core')
+local selfApi = require('openmw.self')
 local I = require('openmw.interfaces')
 local self = require('openmw.self')
 local eligibility = require('scripts.corprus_plague.eligibility')
@@ -135,7 +136,10 @@ return {
             if not plagueKey then
                 return
             end
-            core.sendGlobalEvent('CorprusPlagueInfect', { plagueKey = plagueKey })
+            core.sendGlobalEvent('CorprusPlagueInfect', {
+                plagueKey = plagueKey,
+                player = selfApi.object,
+            })
         end,
     },
 }

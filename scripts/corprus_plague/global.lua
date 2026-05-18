@@ -4,6 +4,7 @@ local carrier = require('scripts.corprus_plague.carrier')
 local storageApi = require('scripts.corprus_plague.storage')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local config = require('scripts.corprus_plague.config')
+local disposition = require('scripts.corprus_plague.disposition')
 local settings = require('scripts.corprus_plague.settings')
 local firstRestDream = require('scripts.corprus_plague.first_rest_dream')
 
@@ -12,9 +13,21 @@ settings.registerGroup()
 local scanAccumulator = 0
 
 local function ensureAllPlayers()
+    local infectionCount = storageApi.getInfectionCount()
     for _, player in ipairs(world.players) do
-        carrier.ensure(player)
+        carrier.ensure(player, infectionCount)
     end
+end
+
+local function syncAllPlayerCarrierStats()
+    local infectionCount = storageApi.getInfectionCount()
+    for _, player in ipairs(world.players) do
+        carrier.syncInfectionCount(player, infectionCount)
+    end
+end
+
+local function getPrimaryPlayer()
+    return world.players[1]
 end
 
 local function onGameReady()
@@ -63,12 +76,17 @@ return {
 
             local actor = actorRef.findActor(plagueKey)
             if actor and actor:isValid() then
-                transform.infect(actor)
+                if transform.infect(actor) then
+                    syncAllPlayerCarrierStats()
+                end
+                disposition.applyInfectionPenalty(actor, data.player or getPrimaryPlayer())
                 return
             end
 
             if not storageApi.isInfected(plagueKey) and not storageApi.isTransformed(plagueKey) then
-                storageApi.markInfected(plagueKey, world.getGameTime())
+                if storageApi.markInfected(plagueKey, world.getGameTime()) then
+                    syncAllPlayerCarrierStats()
+                end
             end
         end,
 

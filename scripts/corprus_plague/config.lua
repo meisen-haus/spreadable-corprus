@@ -37,10 +37,10 @@ return {
     storageSection = 'corprus_plague',
 
     -- Registered in content_register.lua (LOAD context, OpenMW 0.51+).
-    carrierSpellId = 'spreadable corprus',
-    carrierSpellName = 'Spreadable Corprus',
+    carrierSpellId = 'corprus_plague_pandemic',
+    carrierSpellName = 'Pandemic',
     carrierEffectId = 'spreadable_corprus_marker',
-    carrierEffectDescription = 'NPCs you talk to contract corprus',
+    carrierEffectName = 'Divine Disease Carrier',
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,
@@ -52,11 +52,19 @@ return {
     minIncubationDays = 1,
     maxIncubationDays = 21,
 
+    defaultDispositionModifier = 0.5,
+    minDispositionModifier = 0,
+    maxDispositionModifier = 2,
+    dispositionModifierStep = 0.1,
+
     -- Set true for ONE load to wipe bad infection/transform records from earlier tests, then set false.
     clearPlagueDataOnLoad = false,
 
     -- How often to check active NPCs for transformation (seconds of simulation time).
     transformScanInterval = 5,
+
+    spawnVfxMagicEffectIds = { 'corprus', 'blightdisease' },
+    spawnVfxId = 'spreadable_corprus_spawn_vfx',
 
     transformCreatures = {
         { id = 'corprus_stalker', weight = 70 },
