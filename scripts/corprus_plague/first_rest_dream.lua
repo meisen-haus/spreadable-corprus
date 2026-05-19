@@ -57,7 +57,7 @@ end
 local function showDreamMessage()
     local player = world.players[1]
     if player and player:isValid() then
-        -- Player script only: one interactive OK box (see prophecy.lua).
+        -- Player script only: interactive OK box (prophecy uses built-in ShowMessage from global).
         player:sendEvent('CorprusPlagueFirstRestDreamMessage', { message = DREAM_MESSAGE })
     end
 end
