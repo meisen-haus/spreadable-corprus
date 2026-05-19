@@ -39,8 +39,14 @@ return {
     -- Registered in content_register.lua (LOAD context, OpenMW 0.51+).
     carrierSpellId = 'corprus_plague_pandemic',
     carrierSpellName = 'Pandemic',
+    carrierCuredSpellName = 'Pandemic (Cured)',
     carrierEffectId = 'spreadable_corprus_marker',
     carrierEffectName = 'Divine Disease Carrier',
+
+    -- Vanilla main quest update when Dagoth Ur is defeated.
+    cureQuestId = 'C3_DestroyDagoth',
+    cureQuestStage = 50,
+    cureMessage = "Dagoth Ur’s curse has been lifted. You are no longer his Divine Disease carrier, but at what cost to Vvardenfell?",
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,

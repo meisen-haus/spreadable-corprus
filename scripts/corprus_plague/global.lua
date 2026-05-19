@@ -15,15 +15,17 @@ local restWatchFrames = 0
 
 local function ensureAllPlayers()
     local infectionCount = storageApi.getInfectionCount()
+    local cured = storageApi.isCured()
     for _, player in ipairs(world.players) do
-        carrier.ensure(player, infectionCount)
+        carrier.ensure(player, infectionCount, cured)
     end
 end
 
 local function syncAllPlayerCarrierStats()
     local infectionCount = storageApi.getInfectionCount()
+    local cured = storageApi.isCured()
     for _, player in ipairs(world.players) do
-        carrier.syncInfectionCount(player, infectionCount)
+        carrier.syncInfectionCount(player, infectionCount, cured)
     end
 end
 
@@ -80,6 +82,10 @@ return {
 
     eventHandlers = {
         CorprusPlagueInfect = function(data)
+            if storageApi.isCured() then
+                return
+            end
+
             local plagueKey = data.plagueKey
             if not plagueKey then
                 return
@@ -98,6 +104,17 @@ return {
                 if storageApi.markInfected(plagueKey, world.getGameTime()) then
                     syncAllPlayerCarrierStats()
                 end
+            end
+        end,
+
+        CorprusPlagueCureCarrier = function()
+            if not storageApi.markCured() then
+                return
+            end
+
+            syncAllPlayerCarrierStats()
+            for _, player in ipairs(world.players) do
+                player:sendEvent('ShowMessage', { message = config.cureMessage })
             end
         end,
 

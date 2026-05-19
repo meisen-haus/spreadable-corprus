@@ -1,5 +1,5 @@
 CorprusPlague: "Spreadable Corprus"
-settingsPageDescription: "Pandemic options. Infection count is shown in Magic (Pandemic - N pts)."
+settingsPageDescription: "Pandemic options. Infection count is shown in Magic (Pandemic - N pts, or Pandemic (Cured) - N pts after Dagoth Ur)."
 
 pandemicSettings: "Pandemic"
 pandemicSettingsDescription: "Incubation time and how the spread of the pandemic affects NPC disposition toward you."

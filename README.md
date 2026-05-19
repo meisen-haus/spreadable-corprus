@@ -4,7 +4,7 @@ An OpenMW gameplay mod that curses the player as Dagoth Ur's "Divine Disease Car
 
 ## Description
 
-You start the game with incurable, spreadable Corprus - which poses no risk to you and has no symptoms. Any eligible NPC that greets you becomes infected immediately. There is no random chance and no cure for you, or for them.
+You start the game with spreadable Corprus - which poses no risk to you and has no symptoms. Any eligible NPC that greets you becomes infected immediately. There is no random chance and no cure for infected NPCs.
 
 After an incubation period (defaults to 7 days but configurable in-game), the next time that NPC is active in the world they transform: their body is replaced by a Corprus creature (usually a **Corprus Stalker**, sometimes a **Lame Corprus**). This Corprus creature has the original NPCs name and is holding their equipment. Essential NPCs can still transform; you may see the same prophecy-style message vanilla uses when an essential character dies.
 
@@ -28,7 +28,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 
 ## Main features
 
-- **Divine Disease Carrier** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
+- **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and renames the ability to **Pandemic (Cured)** while keeping the final count visible.
 - **First-rest nightmare** — the first interior rest triggers a strange nightmare.
 - **Airborne infection** — when an NPC greets the player they become infected.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.

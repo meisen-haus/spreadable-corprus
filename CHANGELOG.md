@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Defeating Dagoth Ur (`C3_DestroyDagoth` stage 50) now cures the player carrier curse, stops new infections, shows a cure message, and renames the carrier ability to **Pandemic (Cured)** while preserving the existing Pandemic pt count.
+- Save format **version 4** — adds the per-save cured state.
+
 ## [0.2.0] - 2026-05-18
 
 ### Added

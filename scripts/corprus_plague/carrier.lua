@@ -29,6 +29,18 @@ local function hasCarrierEffect(spell)
     return M.getCarrierEffect(spell) ~= nil
 end
 
+local function getCarrierSpellName(cured)
+    if cured then
+        return config.carrierCuredSpellName
+    end
+    return config.carrierSpellName
+end
+
+local function isCurrentCarrierName(name)
+    return name == config.carrierSpellName
+        or name == config.carrierCuredSpellName
+end
+
 function M.getCarrierEffect(spell)
     if not spell or not spell.effects then
         return nil
@@ -55,7 +67,7 @@ local function isCarrierSpell(spell)
         and (
             spell.id == config.carrierSpellId
             or isLegacyCarrierId(spell.id)
-            or (spell.name == config.carrierSpellName and hasCarrierEffect(spell))
+            or (isCurrentCarrierName(spell.name) and hasCarrierEffect(spell))
         )
 end
 
@@ -95,15 +107,16 @@ local function removeCarrierActiveSpellInstances(player)
     end
 end
 
-local function createCarrierSpellRecord(infectionCount)
+local function createCarrierSpellRecord(infectionCount, cured)
     local baseRecord = core.magic.spells.records[config.carrierSpellId]
     if not baseRecord then
         return nil
     end
 
+    local carrierSpellName = getCarrierSpellName(cured)
     for _, spell in pairs(core.magic.spells.records) do
         local effect = M.getCarrierEffect(spell)
-        if spell.name == config.carrierSpellName
+        if spell.name == carrierSpellName
             and effect
             and normalizeInfectionCount(effect.magnitudeMin) == infectionCount
             and normalizeInfectionCount(effect.magnitudeMax) == infectionCount
@@ -114,7 +127,7 @@ local function createCarrierSpellRecord(infectionCount)
 
     local recordDraft = core.magic.spells.createRecordDraft({
         template = baseRecord,
-        name = config.carrierSpellName,
+        name = carrierSpellName,
         type = core.magic.SPELL_TYPE.Ability,
         cost = 0,
         effects = {
@@ -130,7 +143,7 @@ local function createCarrierSpellRecord(infectionCount)
     return world.createRecord(recordDraft)
 end
 
-function M.syncInfectionCount(player, infectionCount)
+function M.syncInfectionCount(player, infectionCount, cured)
     if not player or not player:isValid() then
         return
     end
@@ -140,7 +153,7 @@ function M.syncInfectionCount(player, infectionCount)
     removeCarrierSpells(player)
 
     local spells = types.Actor.spells(player)
-    local ok, carrierSpell = pcall(createCarrierSpellRecord, infectionCount)
+    local ok, carrierSpell = pcall(createCarrierSpellRecord, infectionCount, cured)
     if ok and carrierSpell and carrierSpell.id then
         spells:add(carrierSpell.id)
     else
@@ -148,7 +161,7 @@ function M.syncInfectionCount(player, infectionCount)
     end
 end
 
-function M.ensure(player, infectionCount)
+function M.ensure(player, infectionCount, cured)
     if not player or not player:isValid() then
         return
     end
@@ -156,7 +169,7 @@ function M.ensure(player, infectionCount)
         error('[corprus_plague] carrier spell missing; requires OpenMW 0.51+ with LOAD script')
     end
 
-    M.syncInfectionCount(player, infectionCount)
+    M.syncInfectionCount(player, infectionCount, cured)
 end
 
 return M
