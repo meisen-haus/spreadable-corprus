@@ -9,11 +9,11 @@ function M.isEssentialNpc(actor)
     if not actor or not actor:isValid() then
         return false
     end
-    local record = types.NPC.record(actor.recordId)
+    local record = types.NPC.record(actor)
     return record ~= nil and record.isEssential
 end
 
--- Vanilla essential-death message; must run on the player script (UI.showInteractiveMessage).
+-- Vanilla essential-death GMST; delivered via built-in ShowMessage (player script / openmw.ui).
 function M.notifyPlayerIfEssential(actor)
     if not config.showProphecyOnEssentialMorph then
         return
@@ -28,7 +28,7 @@ function M.notifyPlayerIfEssential(actor)
     end
 
     for _, player in ipairs(world.players) do
-        player:sendEvent('CorprusPlagueEssentialMorph', { message = message })
+        player:sendEvent('ShowMessage', { message = message })
     end
 end
 

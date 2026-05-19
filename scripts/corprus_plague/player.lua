@@ -263,12 +263,6 @@ return {
             debug.log('spawn failed; retry allowed this session')
         end,
 
-        CorprusPlagueEssentialMorph = function(data)
-            if data.message and data.message ~= '' then
-                I.UI.showMessage(data.message)
-            end
-        end,
-
         DialogueResponse = function(data)
             local actor = data.actor
             if not eligibility.isNpcActor(actor) then
