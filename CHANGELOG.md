@@ -7,15 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-18
+
 ### Added
 
+- **First-rest nightmare** — the first time you complete a legal interior rest, a dream message plays and a Corprus Stalker spawns behind you (tracked per save).
 - Per-save counter for **unique NPC infections** (`countedInfections` / `stats.infections` in Pandemic save data).
 - Save format **version 2**; version 1 saves rebuild the infection count from existing infection and transform records on load.
 - Magic UI shows the live count on the carrier ability: active effect **Divine Disease Carrier**, source line **Pandemic - N pts** (N = unique NPCs infected this save, including those already transformed).
 - **Disposition penalty on dialogue** — when an NPC speaks during dialogue, their **base disposition** toward you is reduced by `N × modifier`, where **N** is your current Pandemic pt total (unique infections this save) and **modifier** is the per-pt rate below. Penalties apply only to NPCs you have spoken with; other NPCs are unaffected until you dialogue with them.
 - **Per-NPC penalty tracking** — each NPC stores how much disposition penalty has already been applied. On later conversations, only the **delta** since the last talk is applied, so repeat dialogue does not stack the same penalty twice. Raising or lowering the modifier in settings adjusts the target on the next talk with that NPC.
-- **Disposition modifier** setting — **Settings → Spreadable Corprus → Pandemic → Disposition modifier**: “For each pt of Pandemic, modify base disposition by:” Choose **0–2** in **0.1** steps (default **0.5**). Stored per save.
+- **Disposition modifier** setting — **Settings → Spreadable Corprus → Pandemic → Disposition modifier**: “For each pt of Pandemic, modify base disposition by:” Choose **0–2** in **0.1** steps (default **0.5**). Stored per save. **Off** is **0** (no penalty).
 - Save format **version 3** — adds per-NPC `dispositionPenalties` to the save payload (version 2 saves load without prior penalty records).
+- **Corprus spawn VFX** — a one-shot visual effect on the new creature when an NPC transforms (Corprus / blight disease magic effect visuals).
 
 ### Changed
 
@@ -26,7 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Essential NPC prophecy** — when an essential NPC transforms, the vanilla `sKilledEssential` message is shown again via OpenMW’s built-in `ShowMessage` event (the previous handler called `I.UI.showMessage`, which does not exist on the UI interface).
 - **`findActor` for content-file NPCs** — plague keys prefixed with `f:` no longer stop after a failed `getObjectByFormId` lookup. The handler falls back to scanning active actors, so dialogue infection, carrier sync, and disposition penalties run for the NPC you are actually speaking with (previously Pandemic pts could rise while disposition stayed unchanged).
+- **Disposition penalty at Off** — modifier **0** applies no penalty; penalties no longer clamp incorrectly when base disposition is low.
 
 ### Removed
 
