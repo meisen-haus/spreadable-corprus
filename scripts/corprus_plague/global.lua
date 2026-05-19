@@ -6,11 +6,12 @@ local actorRef = require('scripts.corprus_plague.actor_ref')
 local config = require('scripts.corprus_plague.config')
 local disposition = require('scripts.corprus_plague.disposition')
 local settings = require('scripts.corprus_plague.settings')
-local firstRestDream = require('scripts.corprus_plague.first_rest_dream')
+local firstRestDreamWatch = require('scripts.corprus_plague.first_rest_dream_watch')
 
 settings.registerGroup()
 
 local scanAccumulator = 0
+local restWatchFrames = 0
 
 local function ensureAllPlayers()
     local infectionCount = storageApi.getInfectionCount()
@@ -34,6 +35,10 @@ local function onGameReady()
     storageApi.clearAllPendingTransforms()
     ensureAllPlayers()
     transform.syncWorldWithStorage()
+    firstRestDreamWatch.resetSnapshots()
+    for _, player in ipairs(world.players) do
+        firstRestDreamWatch.onGameReady(player)
+    end
 end
 
 return {
@@ -58,6 +63,12 @@ return {
         end,
 
         onUpdate = function(dt)
+            restWatchFrames = restWatchFrames + 1
+            if restWatchFrames >= 30 then
+                restWatchFrames = 0
+                firstRestDreamWatch.tick()
+            end
+
             scanAccumulator = scanAccumulator + dt
             if scanAccumulator < config.transformScanInterval then
                 return
@@ -90,8 +101,8 @@ return {
             end
         end,
 
-        CorprusPlagueFirstRestDream = function(data)
-            firstRestDream.trigger(data)
+        CorprusPlagueRestCompleted = function(data)
+            firstRestDreamWatch.onPlayerRestCompleted(data)
         end,
     },
 }

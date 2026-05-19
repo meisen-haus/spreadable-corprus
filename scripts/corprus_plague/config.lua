@@ -60,6 +60,11 @@ return {
     -- Set true for ONE load to wipe bad infection/transform records from earlier tests, then set false.
     clearPlagueDataOnLoad = false,
 
+    -- First-rest nightmare — development only (see scripts/corprus_plague/first_rest_dream*.lua).
+    debugFirstRestDream = false, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
+    debugIgnoreFirstRestDreamSave = false, -- allow re-trigger on the same save
+    debugTriggerDreamOnLoad = false, -- fire nightmare immediately on load
+
     -- How often to check active NPCs for transformation (seconds of simulation time).
     transformScanInterval = 5,
 
