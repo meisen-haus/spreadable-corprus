@@ -76,7 +76,7 @@ return {
     -- Vanilla main quest update when Dagoth Ur is defeated.
     cureQuestId = 'C3_DestroyDagoth',
     cureQuestStage = 50,
-    cureMessage = "Dagoth Ur’s curse has been lifted. You are no longer his Divine Disease carrier, but at what cost to Vvardenfell?",
+    cureMessage = "Dagoth Ur is no more, and the Heart's beating comes to a stop, and with it, the vessel of his vengeance is cleansed. Breathe deep, for every breath is a new victory for Morrowind's Incarnate.",
 
     sleepersAwakeQuestId = 'A1_SleepersAwake',
     sleepersAwakeQuestStartStage = 1,

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Revised the post-Dagoth Ur cure message copy.
 - Revised the first-rest nightmare copy with the new Seyda Neen ash-cloud scene.
 
 ## [0.2.0] - 2026-05-18
