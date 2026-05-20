@@ -83,6 +83,8 @@ return {
     sleepersAwakeQuestEndStage = 50,
     sleeperFreedQuestStage = 1,
     sleeperAwakeDialogue = 'The vessel approaches, and we breathe deep, for he is with us even now.',
+    hanaraiRecordId = 'hanarai assutlanipal',
+    hanaraiDialogue = 'The House Unmourned rises. And he shall tear down this kingdom of false kings and bastards. Washed away in a cloud of perfect ash.',
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,

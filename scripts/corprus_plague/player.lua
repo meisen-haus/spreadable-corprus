@@ -89,6 +89,11 @@ local function checkCureQuestCompletion()
     end
 end
 
+local function isDagothUrDefeated()
+    local quest = getCureQuest()
+    return quest ~= nil and (tonumber(quest.stage) or 0) >= config.cureQuestStage
+end
+
 local function isSleepersAwakeActive()
     local quest = getPlayerQuest(config.sleepersAwakeQuestId)
     if not quest then
@@ -118,6 +123,14 @@ local function getNpcDisplayName(actor)
     return actor.recordId
 end
 
+local function formatNpcDialogue(actor, message)
+    return string.format(
+        '%s\n\n"%s"',
+        getNpcDisplayName(actor),
+        message
+    )
+end
+
 local function tryScheduleSleeperAwakeDialogue(data)
     if not isGreetingResponse(data) or not isSleepersAwakeActive() then
         return
@@ -134,11 +147,23 @@ local function tryScheduleSleeperAwakeDialogue(data)
         return
     end
 
-    interactiveMessage.schedule(string.format(
-        '%s\n\n"%s"',
-        getNpcDisplayName(actor),
-        config.sleeperAwakeDialogue
-    ))
+    interactiveMessage.schedule(formatNpcDialogue(actor, config.sleeperAwakeDialogue))
+end
+
+local function tryScheduleHanaraiDialogue(data)
+    if not isGreetingResponse(data) or isDagothUrDefeated() then
+        return
+    end
+
+    local actor = data.actor
+    if not eligibility.isNpcActor(actor) then
+        return
+    end
+    if actor.recordId ~= config.hanaraiRecordId then
+        return
+    end
+
+    interactiveMessage.schedule(formatNpcDialogue(actor, config.hanaraiDialogue))
 end
 
 local function isRestingOnBed()
@@ -410,6 +435,7 @@ return {
                 return
             end
             tryScheduleSleeperAwakeDialogue(data)
+            tryScheduleHanaraiDialogue(data)
             local plagueKey = actorRef.getPlagueKey(actor)
             if not plagueKey then
                 return
