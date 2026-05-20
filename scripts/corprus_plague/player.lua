@@ -265,6 +265,17 @@ local function sendTestRestEvent()
     })
 end
 
+local function scheduleFirstRestDreamMessages(data)
+    if type(data) ~= 'table' then
+        return
+    end
+    if type(data.messages) == 'table' then
+        interactiveMessage.scheduleMany(data.messages)
+        return
+    end
+    interactiveMessage.schedule(data.message)
+end
+
 return {
     engineHandlers = {
         onFrame = function()
@@ -319,9 +330,7 @@ return {
             interactiveMessage.onUiModeChanged(newMode)
         end,
 
-        CorprusPlagueFirstRestDreamMessage = function(data)
-            interactiveMessage.schedule(type(data) == 'table' and data.message or nil)
-        end,
+        CorprusPlagueFirstRestDreamMessage = scheduleFirstRestDreamMessages,
 
         CorprusPlagueCureMessage = function(data)
             interactiveMessage.schedule(type(data) == 'table' and data.message or nil)

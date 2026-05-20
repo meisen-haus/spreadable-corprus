@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Save format **version 4** — adds per-save `cured` and `curePending` (pending retries on load and every 5s until cured).
 - Cure debug flags in `config.lua` (`debugCure`, `debugForceCurePendingOnLoad`, `debugSkipCureApplication`); see [DEVELOPING.md](DEVELOPING.md).
 - Cure and first-rest messages use a deferred OK box so opening them while the developer console is open does not crash the game (shows after closing the console, not on reopen).
+- The first-rest nightmare now continues with a Wise Woman dialogue sequence warning the player about the Sharmat.
+
+### Changed
+
+- Revised the first-rest nightmare copy with the new Seyda Neen ash-cloud scene.
 
 ## [0.2.0] - 2026-05-18
 

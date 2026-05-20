@@ -4,7 +4,7 @@ local I = require('openmw.interfaces')
 
 local M = {}
 
-local pendingMessage = nil
+local pendingMessages = {}
 local deferTryFrames = 0
 local frame = 0
 
@@ -22,6 +22,10 @@ local CONSOLE_KEY_SYMBOLS = {
     ['~'] = true,
 }
 
+local function hasPendingMessage()
+    return #pendingMessages > 0
+end
+
 local function isUiModeBlocking()
     local ok, mode = pcall(I.UI.getMode)
     if not ok then
@@ -31,7 +35,7 @@ local function isUiModeBlocking()
 end
 
 local function canShowInteractiveMessage()
-    if not pendingMessage then
+    if not hasPendingMessage() then
         return false
     end
     if isUiModeBlocking() then
@@ -47,7 +51,7 @@ end
 function M.onConsoleKeyPressed()
     lastConsoleKeyFrame = frame
     fallbackTryFrame = nil
-    if pendingMessage then
+    if hasPendingMessage() then
         -- Console just toggled; try after it finishes opening/closing (typically on close).
         deferTryFrames = CONSOLE_DEFER_FRAMES
     end
@@ -57,7 +61,7 @@ function M.schedule(message)
     if not message or message == '' then
         return
     end
-    pendingMessage = message
+    pendingMessages[#pendingMessages + 1] = message
 
     if frame - lastConsoleKeyFrame < CONSOLE_RECENT_FRAMES then
         -- Console was used recently; show after the next toggle (close) or a short fallback if already closed.
@@ -69,17 +73,25 @@ function M.schedule(message)
     deferTryFrames = DEFAULT_DEFER_FRAMES
 end
 
+function M.scheduleMany(messages)
+    if type(messages) ~= 'table' then
+        return
+    end
+    for _, message in ipairs(messages) do
+        M.schedule(message)
+    end
+end
+
 function M.tryShow()
     if not canShowInteractiveMessage() then
         return false
     end
 
-    local message = pendingMessage
-    pendingMessage = nil
+    local message = table.remove(pendingMessages, 1)
 
     local ok = pcall(I.UI.showInteractiveMessage, message)
     if not ok then
-        pendingMessage = message
+        table.insert(pendingMessages, 1, message)
         return false
     end
     return true
@@ -96,14 +108,14 @@ function M.onFrame()
         return
     end
 
-    if pendingMessage and fallbackTryFrame and frame >= fallbackTryFrame then
+    if hasPendingMessage() and fallbackTryFrame and frame >= fallbackTryFrame then
         fallbackTryFrame = nil
         M.tryShow()
     end
 end
 
 function M.onUiModeChanged(newMode)
-    if newMode == nil and pendingMessage and deferTryFrames <= 0 then
+    if newMode == nil and hasPendingMessage() and deferTryFrames <= 0 then
         deferTryFrames = DEFAULT_DEFER_FRAMES
     end
 end

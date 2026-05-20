@@ -12,14 +12,40 @@ local DREAM_MESSAGE = table.concat({
     'as though it was not a dream at all.\n\n',
     'A tall figure with a golden mask leads you down the gangplank at Seyda Neen introducing you ',
     'to each Imperial officer as though you are a royal guest.\n\n',
-    'You are asked many questions, you smile and answer graciously.\n\n',
-    'You stand tall, arms extended wide, you open your mouth to speak, an ash cloud erupts from ',
-    'your open mouth.\n\n',
-    "The tall figure watches approvingly, you can't see their lips but you know that they are ",
-    'smiling. You smile back through bared teeth, eyes wide with the excitement of a jungle cat ',
-    'on the hunt.\n\n',
-    "They are a friend. They are a rival. You are each other's willing prey.",
+    'You are asked many questions, and want to answer graciously. You stand tall and begin ',
+    'to speak, but your words become ashes in your mouth, before spilling out into the air, ',
+    'sending your hosts running for their lives.\n\n',
+    'The tall figure watches approvingly, as the ash cloud swirls and dances at his delight. ',
+    'You meet their gaze, your face locked in a rictus grin.',
 })
+
+local WISE_WOMAN_DIALOGUE = {
+    table.concat({
+        'Wise Woman\n\n',
+        '"You have become a tool for the Sharmat. A vessel for his grotesquery. ',
+        'You bring doom to this island."',
+    }),
+    table.concat({
+        'You ask, "Sharmat?"\n\n',
+        'Wise Woman\n\n',
+        '"The bastard devil of Red Mountain. With his machinations, he has reached a clawed hand ',
+        'beyond the Ghostfence to spread his malice and his plague. And now you are the bringer ',
+        'of this evil."',
+    }),
+    table.concat({
+        'You ask, "What can I do?"\n\n',
+        'Wise Woman\n\n',
+        '"Throw yourself into the sea, and free yourself from his puppetry. Every day you delay, ',
+        'you murder our people."',
+    }),
+}
+
+local FIRST_REST_MESSAGES = {
+    DREAM_MESSAGE,
+    WISE_WOMAN_DIALOGUE[1],
+    WISE_WOMAN_DIALOGUE[2],
+    WISE_WOMAN_DIALOGUE[3],
+}
 
 local CREATURE_ID = 'corprus_stalker'
 local SPAWN_DISTANCE = 160
@@ -58,7 +84,7 @@ local function showDreamMessage()
     local player = world.players[1]
     if player and player:isValid() then
         -- Player script only: interactive OK box (prophecy uses built-in ShowMessage from global).
-        player:sendEvent('CorprusPlagueFirstRestDreamMessage', { message = DREAM_MESSAGE })
+        player:sendEvent('CorprusPlagueFirstRestDreamMessage', { messages = FIRST_REST_MESSAGES })
     end
 end
 
