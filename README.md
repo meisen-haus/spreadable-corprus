@@ -28,7 +28,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 
 ## Main features
 
-- **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and renames the ability to **Pandemic (Cured)** while keeping the final count visible.
+- **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and the final pt count stay visible.
 - **First-rest nightmare** — the first interior rest triggers a strange nightmare.
 - **Airborne infection** — when an NPC greets the player they become infected.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
@@ -38,6 +38,10 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Immunities** — Some NPCs are immune - for example Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — ["thread of prophecy"](https://en.uesp.net/wiki/Morrowind:Essential_NPCs) message is triggered when an essential NPC transforms.
 - **Per-save tracking** — infection counts and transform lists are written into each save file; after reload, transformed NPCs stay disabled when their cell loads.
+
+## For developers
+
+Debug flags and manual cure tests: [DEVELOPING.md](DEVELOPING.md).
 
 ## Changelog
 

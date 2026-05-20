@@ -10,6 +10,7 @@ local state = {
     pendingTransforms = {},
     firstRestDreamTriggered = false,
     cured = false,
+    curePending = false,
     countedInfections = {},
     dispositionPenalties = {},
     stats = {
@@ -151,6 +152,18 @@ function M.markCured()
     return true
 end
 
+function M.isCurePending()
+    return state.curePending == true
+end
+
+function M.setCurePending(pending)
+    state.curePending = pending == true
+end
+
+function M.clearCurePending()
+    state.curePending = false
+end
+
 function M.getDispositionPenalty(plagueKey)
     if not plagueKey then
         return 0
@@ -195,6 +208,7 @@ function M.clearAll()
     state.pendingTransforms = {}
     state.firstRestDreamTriggered = false
     state.cured = false
+    state.curePending = false
     state.dispositionPenalties = {}
     resetInfectionStats()
 end
@@ -206,6 +220,7 @@ function M.exportForSave()
         transformed = copyTable(state.transformed),
         firstRestDreamTriggered = state.firstRestDreamTriggered,
         cured = state.cured,
+        curePending = state.curePending,
         countedInfections = copyTable(state.countedInfections),
         dispositionPenalties = copyTable(state.dispositionPenalties),
         stats = copyTable(state.stats),
@@ -238,6 +253,7 @@ function M.importFromSave(savedData)
 
         if savedData.version >= 4 then
             state.cured = savedData.cured == true
+            state.curePending = savedData.curePending == true
         end
 
         if savedData.version >= 2 and type(savedData.countedInfections) == 'table' then

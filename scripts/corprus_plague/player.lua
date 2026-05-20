@@ -8,6 +8,7 @@ local debug = require('scripts.corprus_plague.first_rest_debug')
 local eligibility = require('scripts.corprus_plague.eligibility')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local settings = require('scripts.corprus_plague.settings')
+local interactiveMessage = require('scripts.corprus_plague.interactive_message')
 
 local time = { hour = 3600 }
 pcall(function()
@@ -21,8 +22,9 @@ local QUEST_CHECK_FRAME_INTERVAL = 60
 
 local activeRestSession
 local dreamRequestSent = false
-local cureRequestSent = false
 local cureQuestCheckFrames = 0
+local cureInitialQuestCheckDone = false
+local cureRequestSent = false
 local restBedTarget
 local trackedUiMode
 
@@ -69,10 +71,6 @@ local function getCureQuest()
 end
 
 local function checkCureQuestCompletion()
-    if cureRequestSent then
-        return
-    end
-
     local quest = getCureQuest()
     if not quest then
         return
@@ -249,13 +247,6 @@ local function pollRestUiMode()
     handleUiModeTransition(trackedUiMode, mode, nil)
 end
 
-local function showDreamMessage(message)
-    if not message or message == '' then
-        return
-    end
-    I.UI.showInteractiveMessage(message)
-end
-
 local function sendTestRestEvent()
     local cell = getInteriorCell() or self.cell
     if not cell or cell.name == '' then
@@ -283,11 +274,16 @@ return {
                 end)
             end
             pollRestUiMode()
+            if not cureInitialQuestCheckDone then
+                cureInitialQuestCheckDone = true
+                checkCureQuestCompletion()
+            end
             cureQuestCheckFrames = (cureQuestCheckFrames or 0) + 1
             if cureQuestCheckFrames >= QUEST_CHECK_FRAME_INTERVAL then
                 cureQuestCheckFrames = 0
                 checkCureQuestCompletion()
             end
+            interactiveMessage.onFrame()
         end,
 
         onQuestUpdate = function(questId, stage)
@@ -297,6 +293,9 @@ return {
         end,
 
         onKeyPress = function(key)
+            if interactiveMessage.isConsoleKey(key) then
+                interactiveMessage.onConsoleKeyPressed()
+            end
             if not config.debugFirstRestDream then
                 return
             end
@@ -317,10 +316,15 @@ return {
                 oldMode = trackedUiMode
             end
             handleUiModeTransition(oldMode, newMode, data.arg)
+            interactiveMessage.onUiModeChanged(newMode)
         end,
 
         CorprusPlagueFirstRestDreamMessage = function(data)
-            showDreamMessage(type(data) == 'table' and data.message or nil)
+            interactiveMessage.schedule(type(data) == 'table' and data.message or nil)
+        end,
+
+        CorprusPlagueCureMessage = function(data)
+            interactiveMessage.schedule(type(data) == 'table' and data.message or nil)
         end,
 
         CorprusPlagueFirstRestDreamFailed = function()

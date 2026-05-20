@@ -19,6 +19,13 @@ content.magicEffects.records[config.carrierEffectId] = {
     icon = iconTemplate and iconTemplate.icon or effectTemplate.icon,
 }
 
+content.magicEffects.records[config.carrierCuredEffectId] = {
+    template = effectTemplate,
+    name = config.carrierCuredEffectName,
+    harmful = false,
+    icon = iconTemplate and iconTemplate.icon or effectTemplate.icon,
+}
+
 -- Base template; carrier.lua creates per-save variants whose magnitude is the infection count.
 content.spells.records[config.carrierSpellId] = {
     name = config.carrierSpellName,

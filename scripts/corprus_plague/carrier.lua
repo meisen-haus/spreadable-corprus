@@ -11,6 +11,14 @@ local legacyCarrierSpellIds = {
     'spreadable corprus',
 }
 
+-- Renamed spell from an earlier cure build; stripped on sync.
+local legacyCarrierSpellName = 'Pandemic (Cured)'
+
+local carrierEffectIds = {
+    [config.carrierEffectId] = true,
+    [config.carrierCuredEffectId] = true,
+}
+
 local function removeSpell(spells, spellId)
     pcall(function()
         spells:remove(spellId)
@@ -25,20 +33,15 @@ local function normalizeInfectionCount(infectionCount)
     return math.floor(infectionCount)
 end
 
+local function getCarrierEffectId(cured)
+    if cured then
+        return config.carrierCuredEffectId
+    end
+    return config.carrierEffectId
+end
+
 local function hasCarrierEffect(spell)
     return M.getCarrierEffect(spell) ~= nil
-end
-
-local function getCarrierSpellName(cured)
-    if cured then
-        return config.carrierCuredSpellName
-    end
-    return config.carrierSpellName
-end
-
-local function isCurrentCarrierName(name)
-    return name == config.carrierSpellName
-        or name == config.carrierCuredSpellName
 end
 
 function M.getCarrierEffect(spell)
@@ -46,7 +49,7 @@ function M.getCarrierEffect(spell)
         return nil
     end
     for _, effect in pairs(spell.effects) do
-        if effect.id == config.carrierEffectId then
+        if carrierEffectIds[effect.id] then
             return effect
         end
     end
@@ -67,7 +70,8 @@ local function isCarrierSpell(spell)
         and (
             spell.id == config.carrierSpellId
             or isLegacyCarrierId(spell.id)
-            or (isCurrentCarrierName(spell.name) and hasCarrierEffect(spell))
+            or (spell.name == config.carrierSpellName and hasCarrierEffect(spell))
+            or (spell.name == legacyCarrierSpellName and hasCarrierEffect(spell))
         )
 end
 
@@ -113,11 +117,14 @@ local function createCarrierSpellRecord(infectionCount, cured)
         return nil
     end
 
-    local carrierSpellName = getCarrierSpellName(cured)
+    local effectId = getCarrierEffectId(cured)
+    infectionCount = normalizeInfectionCount(infectionCount)
+
     for _, spell in pairs(core.magic.spells.records) do
         local effect = M.getCarrierEffect(spell)
-        if spell.name == carrierSpellName
+        if spell.name == config.carrierSpellName
             and effect
+            and effect.id == effectId
             and normalizeInfectionCount(effect.magnitudeMin) == infectionCount
             and normalizeInfectionCount(effect.magnitudeMax) == infectionCount
         then
@@ -127,12 +134,12 @@ local function createCarrierSpellRecord(infectionCount, cured)
 
     local recordDraft = core.magic.spells.createRecordDraft({
         template = baseRecord,
-        name = carrierSpellName,
+        name = config.carrierSpellName,
         type = core.magic.SPELL_TYPE.Ability,
         cost = 0,
         effects = {
             {
-                id = config.carrierEffectId,
+                id = effectId,
                 range = core.magic.RANGE.Self,
                 duration = 0,
                 magnitudeMin = infectionCount,
