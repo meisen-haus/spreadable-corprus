@@ -7,15 +7,18 @@ local function idSet(ids)
     return set
 end
 
--- Sleepers Awake victims (UESP: Morrowind:Sleepers_Awake) plus Sixth House faction NPCs.
-local sleeperAndHouseNpcIds = {
+-- Sixth House faction NPCs (Category:Morrowind-Factions-Sixth House).
+local sixthHouseNpcIds = {
     -- Sixth House faction (Category:Morrowind-Factions-Sixth House)
     'dreamer prophet',
     'hanarai assutlanipal',
     'zula',
     -- Generic dreamer NPC record used in Sixth House areas
     'dreamer',
-    -- Mind-controlled "Sleeper" agents (15 reputation rewards)
+}
+
+-- Mind-controlled "Sleeper" agents (UESP: Morrowind:Sleepers_Awake; 15 reputation rewards).
+local sleeperNpcIds = {
     'alvura othrenim',
     'assi serimilk',
     'daynasa telandas',
@@ -33,6 +36,32 @@ local sleeperAndHouseNpcIds = {
     'vivyne andrano',
 }
 
+local sleeperQuestIds = {
+    ['alvura othrenim'] = 'A1_Sleepers_Alvura',
+    ['assi serimilk'] = 'A1_Sleepers_Assi',
+    ['daynasa telandas'] = 'A1_Sleepers_Daynasa',
+    ['dralas gilu'] = 'A1_Sleepers_Dralas',
+    ['drarayne girith'] = 'A1_Sleepers_Drarayne',
+    ['dravasa andrethi'] = 'A1_Sleepers_Dravasa',
+    ['endris dilmyn'] = 'A1_Sleepers_Endris',
+    ['eralane hledas'] = 'A1_Sleepers_Eralane',
+    ['llandras belaal'] = 'A1_Sleepers_Llandras',
+    ['neldris llervu'] = 'A1_Sleepers_Neldris',
+    ['nelmil hler'] = 'A1_Sleepers_Nelmil',
+    ['rararyn radarys'] = 'A1_Sleepers_Rararyn',
+    ['relur faryon'] = 'A1_Sleepers_Relur',
+    ['vireveri darethran'] = 'A1_Sleepers_Vireveri',
+    ['vivyne andrano'] = 'A1_Sleepers_Vivyne',
+}
+
+local sleeperAndHouseNpcIds = {}
+for _, id in ipairs(sixthHouseNpcIds) do
+    sleeperAndHouseNpcIds[#sleeperAndHouseNpcIds + 1] = id
+end
+for _, id in ipairs(sleeperNpcIds) do
+    sleeperAndHouseNpcIds[#sleeperAndHouseNpcIds + 1] = id
+end
+
 return {
     storageSection = 'corprus_plague',
 
@@ -48,6 +77,12 @@ return {
     cureQuestId = 'C3_DestroyDagoth',
     cureQuestStage = 50,
     cureMessage = "Dagoth Ur’s curse has been lifted. You are no longer his Divine Disease carrier, but at what cost to Vvardenfell?",
+
+    sleepersAwakeQuestId = 'A1_SleepersAwake',
+    sleepersAwakeQuestStartStage = 1,
+    sleepersAwakeQuestEndStage = 50,
+    sleeperFreedQuestStage = 1,
+    sleeperAwakeDialogue = 'The vessel approaches, and we breathe deep, for he is with us even now.',
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,
@@ -104,5 +139,7 @@ return {
         'dreamer',
     }),
 
+    sleeperRecordIds = idSet(sleeperNpcIds),
+    sleeperQuestIds = sleeperQuestIds,
     immuneSleeperRecordIds = idSet(sleeperAndHouseNpcIds),
 }

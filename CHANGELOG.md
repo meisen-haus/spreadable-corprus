@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cure debug flags in `config.lua` (`debugCure`, `debugForceCurePendingOnLoad`, `debugSkipCureApplication`); see [DEVELOPING.md](DEVELOPING.md).
 - Cure and first-rest messages use a deferred OK box so opening them while the developer console is open does not crash the game (shows after closing the console, not on reopen).
 - The first-rest nightmare now continues with a Wise Woman dialogue sequence warning the player about the Sharmat.
+- Named Sleepers now speak a new line after `A1_SleepersAwake` starts and before they are freed.
 
 ### Changed
 

@@ -46,6 +46,10 @@ local function isCureQuestUpdate(questId, stage)
         and (tonumber(stage) or 0) >= config.cureQuestStage
 end
 
+local function isGreetingResponse(data)
+    return type(data) == 'table' and data.type == 'greeting'
+end
+
 local function sendCureRequest()
     if cureRequestSent then
         return
@@ -54,7 +58,7 @@ local function sendCureRequest()
     core.sendGlobalEvent('CorprusPlagueCureCarrier')
 end
 
-local function getCureQuest()
+local function getPlayerQuest(questId)
     if not types.Player or not types.Player.quests then
         return nil
     end
@@ -66,8 +70,12 @@ local function getCureQuest()
         return nil
     end
 
-    return quests[config.cureQuestId]
-        or quests[normalizeQuestId(config.cureQuestId)]
+    return quests[questId]
+        or quests[normalizeQuestId(questId)]
+end
+
+local function getCureQuest()
+    return getPlayerQuest(config.cureQuestId)
 end
 
 local function checkCureQuestCompletion()
@@ -79,6 +87,58 @@ local function checkCureQuestCompletion()
     if (tonumber(quest.stage) or 0) >= config.cureQuestStage then
         sendCureRequest()
     end
+end
+
+local function isSleepersAwakeActive()
+    local quest = getPlayerQuest(config.sleepersAwakeQuestId)
+    if not quest then
+        return false
+    end
+
+    local stage = tonumber(quest.stage) or 0
+    return stage >= config.sleepersAwakeQuestStartStage
+        and stage < config.sleepersAwakeQuestEndStage
+end
+
+local function isSleeperFreed(recordId)
+    local questId = config.sleeperQuestIds[recordId]
+    if not questId then
+        return false
+    end
+
+    local quest = getPlayerQuest(questId)
+    return quest ~= nil and (tonumber(quest.stage) or 0) >= config.sleeperFreedQuestStage
+end
+
+local function getNpcDisplayName(actor)
+    local npcRecord = types.NPC.record(actor.recordId)
+    if npcRecord and npcRecord.name and npcRecord.name ~= '' then
+        return npcRecord.name
+    end
+    return actor.recordId
+end
+
+local function tryScheduleSleeperAwakeDialogue(data)
+    if not isGreetingResponse(data) or not isSleepersAwakeActive() then
+        return
+    end
+
+    local actor = data.actor
+    if not eligibility.isNpcActor(actor) then
+        return
+    end
+    if not config.sleeperRecordIds[actor.recordId] then
+        return
+    end
+    if isSleeperFreed(actor.recordId) then
+        return
+    end
+
+    interactiveMessage.schedule(string.format(
+        '%s\n\n"%s"',
+        getNpcDisplayName(actor),
+        config.sleeperAwakeDialogue
+    ))
 end
 
 local function isRestingOnBed()
@@ -342,10 +402,14 @@ return {
         end,
 
         DialogueResponse = function(data)
+            if type(data) ~= 'table' then
+                return
+            end
             local actor = data.actor
             if not eligibility.isNpcActor(actor) then
                 return
             end
+            tryScheduleSleeperAwakeDialogue(data)
             local plagueKey = actorRef.getPlagueKey(actor)
             if not plagueKey then
                 return
