@@ -4,7 +4,7 @@ An OpenMW gameplay mod that curses the player as Dagoth Ur's "Divine Disease Car
 
 ## Description
 
-You start the game with incurable, spreadable Corprus - which poses no risk to you and has no symptoms. Any eligible NPC that greets you becomes infected immediately. There is no random chance and no cure for you, or for them.
+You start the game with spreadable Corprus - which poses no risk to you and has no symptoms. Any eligible NPC that greets you becomes infected immediately. There is no random chance and no cure for infected NPCs.
 
 After an incubation period (defaults to 7 days but configurable in-game), the next time that NPC is active in the world they transform: their body is replaced by a Corprus creature (usually a **Corprus Stalker**, sometimes a **Lame Corprus**). This Corprus creature has the original NPCs name and is holding their equipment. Essential NPCs can still transform; you may see the same prophecy-style message vanilla uses when an essential character dies.
 
@@ -28,7 +28,7 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 
 ## Main features
 
-- **Divine Disease Carrier** — permanent player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save.
+- **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and the final pt count stay visible.
 - **First-rest nightmare** — the first interior rest triggers a strange nightmare.
 - **Airborne infection** — when an NPC greets the player they become infected.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
@@ -38,6 +38,10 @@ No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatic
 - **Immunities** — Some NPCs are immune - for example Sixth House faction members, **Dreamer**-class NPCs, and named Sleepers / related cultists (see `scripts/corprus_plague/config.lua` for the full ID list).
 - **Essential warning** — ["thread of prophecy"](https://en.uesp.net/wiki/Morrowind:Essential_NPCs) message is triggered when an essential NPC transforms.
 - **Per-save tracking** — infection counts and transform lists are written into each save file; after reload, transformed NPCs stay disabled when their cell loads.
+
+## For developers
+
+Debug flags and manual cure tests: [DEVELOPING.md](DEVELOPING.md).
 
 ## Changelog
 

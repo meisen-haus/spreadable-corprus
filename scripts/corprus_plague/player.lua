@@ -8,6 +8,7 @@ local debug = require('scripts.corprus_plague.first_rest_debug')
 local eligibility = require('scripts.corprus_plague.eligibility')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local settings = require('scripts.corprus_plague.settings')
+local interactiveMessage = require('scripts.corprus_plague.interactive_message')
 
 local time = { hour = 3600 }
 pcall(function()
@@ -17,9 +18,13 @@ end)
 pcall(settings.registerPage)
 
 local MIN_REST_GAME_SECONDS = math.max(1, (time.hour or 3600) * 0.5)
+local QUEST_CHECK_FRAME_INTERVAL = 60
 
 local activeRestSession
 local dreamRequestSent = false
+local cureQuestCheckFrames = 0
+local cureInitialQuestCheckDone = false
+local cureRequestSent = false
 local restBedTarget
 local trackedUiMode
 
@@ -27,6 +32,53 @@ local REST_MODE = (I.UI.MODE and I.UI.MODE.Rest) or 'Rest'
 
 local function modeIsRest(mode)
     return mode == REST_MODE
+end
+
+local function normalizeQuestId(questId)
+    if type(questId) ~= 'string' then
+        return nil
+    end
+    return string.lower(questId)
+end
+
+local function isCureQuestUpdate(questId, stage)
+    return normalizeQuestId(questId) == normalizeQuestId(config.cureQuestId)
+        and (tonumber(stage) or 0) >= config.cureQuestStage
+end
+
+local function sendCureRequest()
+    if cureRequestSent then
+        return
+    end
+    cureRequestSent = true
+    core.sendGlobalEvent('CorprusPlagueCureCarrier')
+end
+
+local function getCureQuest()
+    if not types.Player or not types.Player.quests then
+        return nil
+    end
+
+    local ok, quests = pcall(function()
+        return types.Player.quests(selfApi.object)
+    end)
+    if not ok or not quests then
+        return nil
+    end
+
+    return quests[config.cureQuestId]
+        or quests[normalizeQuestId(config.cureQuestId)]
+end
+
+local function checkCureQuestCompletion()
+    local quest = getCureQuest()
+    if not quest then
+        return
+    end
+
+    if (tonumber(quest.stage) or 0) >= config.cureQuestStage then
+        sendCureRequest()
+    end
 end
 
 local function isRestingOnBed()
@@ -195,13 +247,6 @@ local function pollRestUiMode()
     handleUiModeTransition(trackedUiMode, mode, nil)
 end
 
-local function showDreamMessage(message)
-    if not message or message == '' then
-        return
-    end
-    I.UI.showInteractiveMessage(message)
-end
-
 local function sendTestRestEvent()
     local cell = getInteriorCell() or self.cell
     if not cell or cell.name == '' then
@@ -229,9 +274,28 @@ return {
                 end)
             end
             pollRestUiMode()
+            if not cureInitialQuestCheckDone then
+                cureInitialQuestCheckDone = true
+                checkCureQuestCompletion()
+            end
+            cureQuestCheckFrames = (cureQuestCheckFrames or 0) + 1
+            if cureQuestCheckFrames >= QUEST_CHECK_FRAME_INTERVAL then
+                cureQuestCheckFrames = 0
+                checkCureQuestCompletion()
+            end
+            interactiveMessage.onFrame()
+        end,
+
+        onQuestUpdate = function(questId, stage)
+            if isCureQuestUpdate(questId, stage) then
+                sendCureRequest()
+            end
         end,
 
         onKeyPress = function(key)
+            if interactiveMessage.isConsoleKey(key) then
+                interactiveMessage.onConsoleKeyPressed()
+            end
             if not config.debugFirstRestDream then
                 return
             end
@@ -252,10 +316,15 @@ return {
                 oldMode = trackedUiMode
             end
             handleUiModeTransition(oldMode, newMode, data.arg)
+            interactiveMessage.onUiModeChanged(newMode)
         end,
 
         CorprusPlagueFirstRestDreamMessage = function(data)
-            showDreamMessage(type(data) == 'table' and data.message or nil)
+            interactiveMessage.schedule(type(data) == 'table' and data.message or nil)
+        end,
+
+        CorprusPlagueCureMessage = function(data)
+            interactiveMessage.schedule(type(data) == 'table' and data.message or nil)
         end,
 
         CorprusPlagueFirstRestDreamFailed = function()

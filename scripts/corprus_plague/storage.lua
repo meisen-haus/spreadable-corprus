@@ -1,7 +1,7 @@
 local storage = require('openmw.storage')
 local config = require('scripts.corprus_plague.config')
 
-local SAVE_VERSION = 3
+local SAVE_VERSION = 4
 
 -- Per-save state (round-tripped via global.lua onSave/onLoad). Not in Persistent storage.
 local state = {
@@ -9,6 +9,8 @@ local state = {
     transformed = {},
     pendingTransforms = {},
     firstRestDreamTriggered = false,
+    cured = false,
+    curePending = false,
     countedInfections = {},
     dispositionPenalties = {},
     stats = {
@@ -138,6 +140,30 @@ function M.getInfectionCount()
     return state.stats.infections
 end
 
+function M.isCured()
+    return state.cured == true
+end
+
+function M.markCured()
+    if state.cured then
+        return false
+    end
+    state.cured = true
+    return true
+end
+
+function M.isCurePending()
+    return state.curePending == true
+end
+
+function M.setCurePending(pending)
+    state.curePending = pending == true
+end
+
+function M.clearCurePending()
+    state.curePending = false
+end
+
 function M.getDispositionPenalty(plagueKey)
     if not plagueKey then
         return 0
@@ -181,6 +207,8 @@ function M.clearAll()
     state.transformed = {}
     state.pendingTransforms = {}
     state.firstRestDreamTriggered = false
+    state.cured = false
+    state.curePending = false
     state.dispositionPenalties = {}
     resetInfectionStats()
 end
@@ -191,6 +219,8 @@ function M.exportForSave()
         infections = copyTable(state.infections),
         transformed = copyTable(state.transformed),
         firstRestDreamTriggered = state.firstRestDreamTriggered,
+        cured = state.cured,
+        curePending = state.curePending,
         countedInfections = copyTable(state.countedInfections),
         dispositionPenalties = copyTable(state.dispositionPenalties),
         stats = copyTable(state.stats),
@@ -210,15 +240,20 @@ function M.importFromSave(savedData)
         return
     end
 
-    if savedData and (savedData.version == SAVE_VERSION or savedData.version == 2 or savedData.version == 1) then
+    if savedData and type(savedData.version) == 'number' and savedData.version >= 1 and savedData.version <= SAVE_VERSION then
         if type(savedData.infections) == 'table' then
             state.infections = copyTable(savedData.infections)
         end
         if type(savedData.transformed) == 'table' then
             state.transformed = copyTable(savedData.transformed)
         end
-        if savedData.version == SAVE_VERSION and type(savedData.dispositionPenalties) == 'table' then
+        if savedData.version >= 3 and type(savedData.dispositionPenalties) == 'table' then
             state.dispositionPenalties = copyTable(savedData.dispositionPenalties)
+        end
+
+        if savedData.version >= 4 then
+            state.cured = savedData.cured == true
+            state.curePending = savedData.curePending == true
         end
 
         if savedData.version >= 2 and type(savedData.countedInfections) == 'table' then

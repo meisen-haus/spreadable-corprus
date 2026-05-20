@@ -41,6 +41,13 @@ return {
     carrierSpellName = 'Pandemic',
     carrierEffectId = 'spreadable_corprus_marker',
     carrierEffectName = 'Divine Disease Carrier',
+    carrierCuredEffectId = 'spreadable_corprus_marker_cured',
+    carrierCuredEffectName = 'Divine Disease Carrier (Cured)',
+
+    -- Vanilla main quest update when Dagoth Ur is defeated.
+    cureQuestId = 'C3_DestroyDagoth',
+    cureQuestStage = 50,
+    cureMessage = "Dagoth Ur’s curse has been lifted. You are no longer his Divine Disease carrier, but at what cost to Vvardenfell?",
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,
@@ -64,6 +71,11 @@ return {
     debugFirstRestDream = false, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
     debugIgnoreFirstRestDreamSave = false, -- allow re-trigger on the same save
     debugTriggerDreamOnLoad = false, -- fire nightmare immediately on load
+
+    -- Carrier cure (Dagoth Ur) — development only. See DEVELOPING.md.
+    debugCure = false, -- log cure flow to openmw.log ([corprus_plague] cure: …)
+    debugForceCurePendingOnLoad = false, -- set curePending on every load (smoke-test load retry)
+    debugSkipCureApplication = false, -- accept cure events but do not mark cured (fail-state test)
 
     -- How often to check active NPCs for transformation (seconds of simulation time).
     transformScanInterval = 5,
