@@ -2,11 +2,28 @@
 
 Edit `scripts/corprus_plague/config.lua`, then **restart OpenMW** (config is read at startup).
 
+## Core tuning (`config.lua`)
+
+| Setting | Purpose |
+|---------|---------|
+| `enableStory` | `true` (default): nightmare, journal, cure, dialogue integration. `false`: pandemic mechanics only. |
+| `transformCreatures` | `{ id, weight }` list for NPC morph targets. Weights are relative; IDs lowercased at load. Empty or invalid lists error at startup. Use exact Morrowind record IDs (e.g. `atronach_flame`). |
+| `immuneRecordIds` | Named NPC record IDs that cannot be infected. |
+| `immuneFactions` | Faction IDs (e.g. `sixth house`). |
+| `immuneClasses` | Class IDs (e.g. `dreamer`). |
+| `immuneSleeperRecordIds` | Sleeper / Sixth House NPC IDs (also mirrored in `tools/build_dialogue_esp.mjs` for story dialogue). |
+| `transformScanInterval` | Seconds between active-NPC transform scans (default 5). |
+| `showProphecyOnEssentialMorph` | Show vanilla essential-death message when an essential NPC transforms. |
+
+Incubation and disposition defaults are in-game (**Settings → Spreadable Corprus → Pandemic**); bounds are in `config.lua`.
+
 ## Logs
 
 `debugCure = true` → `openmw.log`, search `[corprus_plague] cure:` (Windows: `Documents\My Games\OpenMW\openmw.log`).
 
 ## Debug flags (`config.lua`)
+
+Story mode only unless noted:
 
 | Flag | Purpose |
 |------|---------|
@@ -16,7 +33,11 @@ Edit `scripts/corprus_plague/config.lua`, then **restart OpenMW** (config is rea
 | `clearPlagueDataOnLoad` | One load: wipe mod plague data only (vanilla quest unchanged). |
 | `debugFirstRestDream` | Log/toast first-rest dream (`[corprus_plague] dream:`); F9 forces encounter indoors. |
 
-## Console
+First-rest nightmare triggers on **sleep** (bed or rest-until-healed with stat recovery), not on **Wait**. OpenMW uses the same Rest UI mode for both; the mod checks bed use or HP/fatigue gain to tell them apart.
+
+## Story QA (console)
+
+Requires `enableStory = true` and usually `corprus_plague_dialogue.omwaddon` for journal text.
 
 First-rest nightmare journal: `journal cp_carrier 10` (sets the journal entry and enables Wise Woman topic dialogue).
 
@@ -26,7 +47,7 @@ Close the developer console (`` ` ``) before the cure OK box — `showInteractiv
 
 ## Cure tests
 
-Use `debugCure = true` to verify logs.
+Requires `enableStory = true`. Use `debugCure = true` to verify logs.
 
 **1 — Failed apply + load retry**
 

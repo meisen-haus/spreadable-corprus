@@ -61,6 +61,9 @@ local function showDreamMessage()
 end
 
 function M.trigger(data)
+    if not config.enableStory then
+        return
+    end
     debug.log('trigger called')
 
     if storageApi.hasFirstRestDreamTriggered() and not config.debugIgnoreFirstRestDreamSave then

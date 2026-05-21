@@ -1,5 +1,5 @@
 CorprusPlague: "Spreadable Corprus"
-settingsPageDescription: "Pandemic options. Infection count is shown in Magic (Pandemic - N pts; active effect becomes Divine Disease Carrier (Cured) after Dagoth Ur)."
+settingsPageDescription: "Pandemic options. Infection count is shown in Magic (Pandemic - N pts). With story mode enabled, defeating Dagoth Ur changes the active effect to Divine Disease Carrier (Cured)."
 
 pandemicSettings: "Pandemic"
 pandemicSettingsDescription: "Incubation time and how the spread of the pandemic affects NPC disposition toward you."

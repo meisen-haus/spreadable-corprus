@@ -16,6 +16,7 @@ pcall(function()
 end)
 
 pcall(settings.registerPage)
+pcall(settings.registerGroup)
 
 local MIN_REST_GAME_SECONDS = math.max(1, (time.hour or 3600) * 0.5)
 local QUEST_CHECK_FRAME_INTERVAL = 60
@@ -47,6 +48,9 @@ local function isCureQuestUpdate(questId, stage)
 end
 
 local function sendCureRequest()
+    if not config.enableStory then
+        return
+    end
     if cureRequestSent then
         return
     end
@@ -71,6 +75,9 @@ local function getCureQuest()
 end
 
 local function checkCureQuestCompletion()
+    if not config.enableStory then
+        return
+    end
     local quest = getCureQuest()
     if not quest then
         return
@@ -161,10 +168,14 @@ local function beginRestSession()
 
     debug.log('rest session started in ' .. cell.name .. (isRestingOnBed() and ' (bed)' or ''))
 
+    local stats = types.Actor.stats(selfApi.object)
     return {
         cellName = cell.name,
         startGameTime = core.getGameTime(),
         sawTimeAdvance = false,
+        onBed = isRestingOnBed(),
+        healthBefore = stats.health.current,
+        fatigueBefore = stats.fatigue.current,
         position = {
             x = self.position.x,
             y = self.position.y,
@@ -187,6 +198,21 @@ local function buildRestPayload(session)
     }
 end
 
+local function sessionWasSleep(session)
+    if session.onBed then
+        return true
+    end
+
+    local stats = types.Actor.stats(selfApi.object)
+    if stats.health.current > session.healthBefore + 0.5 then
+        return true
+    end
+    if stats.fatigue.current > session.fatigueBefore + 0.5 then
+        return true
+    end
+    return false
+end
+
 local function tryCompleteRestSession()
     local session = activeRestSession
     activeRestSession = nil
@@ -204,8 +230,16 @@ local function tryCompleteRestSession()
         debug.log('rest ended in different cell')
         return
     end
+    if not sessionWasSleep(session) then
+        debug.log('wait ended (no sleep recovery)')
+        return
+    end
 
     debug.log(string.format('rest complete in %s (%.1fs)', session.cellName, elapsed))
+
+    if not config.enableStory then
+        return
+    end
 
     dreamRequestSent = true
     core.sendGlobalEvent('CorprusPlagueRestCompleted', buildRestPayload(session))
@@ -248,6 +282,9 @@ local function pollRestUiMode()
 end
 
 local function sendTestRestEvent()
+    if not config.enableStory then
+        return
+    end
     local cell = getInteriorCell() or self.cell
     if not cell or cell.name == '' then
         debug.toast('[Corprus] F9 test: need interior cell')
@@ -274,19 +311,24 @@ return {
                 end)
             end
             pollRestUiMode()
-            if not cureInitialQuestCheckDone then
-                cureInitialQuestCheckDone = true
-                checkCureQuestCompletion()
-            end
-            cureQuestCheckFrames = (cureQuestCheckFrames or 0) + 1
-            if cureQuestCheckFrames >= QUEST_CHECK_FRAME_INTERVAL then
-                cureQuestCheckFrames = 0
-                checkCureQuestCompletion()
+            if config.enableStory then
+                if not cureInitialQuestCheckDone then
+                    cureInitialQuestCheckDone = true
+                    checkCureQuestCompletion()
+                end
+                cureQuestCheckFrames = (cureQuestCheckFrames or 0) + 1
+                if cureQuestCheckFrames >= QUEST_CHECK_FRAME_INTERVAL then
+                    cureQuestCheckFrames = 0
+                    checkCureQuestCompletion()
+                end
             end
             interactiveMessage.onFrame()
         end,
 
         onQuestUpdate = function(questId, stage)
+            if not config.enableStory then
+                return
+            end
             if isCureQuestUpdate(questId, stage) then
                 sendCureRequest()
             end

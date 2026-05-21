@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`enableStory`** config flag (`config.lua`) — set `false` for core pandemic only (no first-rest nightmare, journal writes, or Dagoth Ur cure). **`corprus_plague_dialogue.omwaddon`** is optional for mechanics-only installs.
+- **`transformCreatures`** validation at startup — misconfigured lists fail fast with a clear error; creature IDs are normalized to lowercase.
+
+### Changed
+
+- README and DEVELOPING split **core pandemic** vs **optional story content**; dialogue plugin documented as optional for spread/transform/Pandemic.
+- Transformation targets are configured via **`transformCreatures`** in `config.lua` (weighted relative list), not hardcoded 70/30 in docs.
+- Pandemic settings registration runs from the player script so the options menu stays available if the global script fails to load.
+- **`spawn_creature.lua`** tries custom named clones first, then falls back to vanilla `world.createObject` if record creation fails.
+
+### Fixed
+
+- First-rest nightmare no longer triggers on **Wait**—only on actual sleep (bed or HP/fatigue recovery).
+- Removed interior time-advance backup that could fire the nightmare after waiting.
+- Transform spawn uses validated creature IDs with a reliable fallback path for custom morph targets.
+
+### Added (story content)
+
 - **`corprus_plague_dialogue.omwaddon`** — companion plugin (rebuild with `node tools/build_dialogue_esp.mjs`):
   - Journal **`cp_carrier`**: stage **10** (first-rest nightmare, first person) and stage **100** (carrier cured, written when Dagoth Ur is defeated).
   - Topic **`strange nightmare`**, gated on **`cp_carrier` ≥ 10** unless noted:

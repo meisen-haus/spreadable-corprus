@@ -5,14 +5,10 @@ local storageApi = require('scripts.corprus_plague.storage')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local config = require('scripts.corprus_plague.config')
 local disposition = require('scripts.corprus_plague.disposition')
-local settings = require('scripts.corprus_plague.settings')
 local firstRestDreamWatch = require('scripts.corprus_plague.first_rest_dream_watch')
 local cureDebug = require('scripts.corprus_plague.cure_debug')
 
-settings.registerGroup()
-
 local scanAccumulator = 0
-local restWatchFrames = 0
 local cureRetryAccumulator = 0
 local CURE_RETRY_INTERVAL = 5
 
@@ -78,6 +74,9 @@ local function applyCarrierCure(showMessage)
 end
 
 local function tryFinishPendingCure(reason)
+    if not config.enableStory then
+        return
+    end
     if storageApi.isCured() then
         if storageApi.isCurePending() then
             storageApi.clearCurePending()
@@ -96,12 +95,16 @@ end
 
 local function onGameReady()
     storageApi.clearAllPendingTransforms()
-    tryFinishPendingCure('gameReady')
+    if config.enableStory then
+        tryFinishPendingCure('gameReady')
+    end
     ensureAllPlayers()
     transform.syncWorldWithStorage()
-    firstRestDreamWatch.resetSnapshots()
-    for _, player in ipairs(world.players) do
-        firstRestDreamWatch.onGameReady(player)
+    if config.enableStory then
+        firstRestDreamWatch.resetSnapshots()
+        for _, player in ipairs(world.players) do
+            firstRestDreamWatch.onGameReady(player)
+        end
     end
 end
 
@@ -118,11 +121,14 @@ return {
 
         onLoad = function(savedData)
             storageApi.importFromSave(savedData)
-            if config.debugForceCurePendingOnLoad then
-                storageApi.setCurePending(true)
-                cureDebug.log('debugForceCurePendingOnLoad: curePending set')
+            storageApi.clearAllPendingTransforms()
+            if config.enableStory then
+                if config.debugForceCurePendingOnLoad then
+                    storageApi.setCurePending(true)
+                    cureDebug.log('debugForceCurePendingOnLoad: curePending set')
+                end
+                tryFinishPendingCure('load')
             end
-            tryFinishPendingCure('load')
         end,
 
         onPlayerAdded = onGameReady,
@@ -132,20 +138,16 @@ return {
         end,
 
         onUpdate = function(dt)
-            restWatchFrames = restWatchFrames + 1
-            if restWatchFrames >= 30 then
-                restWatchFrames = 0
-                firstRestDreamWatch.tick()
-            end
-
-            if storageApi.isCurePending() and not storageApi.isCured() then
-                cureRetryAccumulator = cureRetryAccumulator + dt
-                if cureRetryAccumulator >= CURE_RETRY_INTERVAL then
+            if config.enableStory then
+                if storageApi.isCurePending() and not storageApi.isCured() then
+                    cureRetryAccumulator = cureRetryAccumulator + dt
+                    if cureRetryAccumulator >= CURE_RETRY_INTERVAL then
+                        cureRetryAccumulator = 0
+                        tryFinishPendingCure('periodic')
+                    end
+                else
                     cureRetryAccumulator = 0
-                    tryFinishPendingCure('periodic')
                 end
-            else
-                cureRetryAccumulator = 0
             end
 
             scanAccumulator = scanAccumulator + dt
@@ -185,6 +187,9 @@ return {
         end,
 
         CorprusPlagueCureCarrier = function()
+            if not config.enableStory then
+                return
+            end
             if storageApi.isCured() then
                 storageApi.clearCurePending()
                 return
@@ -199,6 +204,9 @@ return {
         end,
 
         CorprusPlagueRestCompleted = function(data)
+            if not config.enableStory then
+                return
+            end
             firstRestDreamWatch.onPlayerRestCompleted(data)
         end,
     },
