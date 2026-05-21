@@ -14,9 +14,11 @@ Edit `scripts/corprus_plague/config.lua`, then **restart OpenMW** (config is rea
 | `debugSkipCureApplication` | Full cure pipeline but never set `cured`; leaves `curePending` for retry tests. |
 | `debugForceCurePendingOnLoad` | Set `curePending` on every load (smoke-test load retry). Disable after use. |
 | `clearPlagueDataOnLoad` | One load: wipe mod plague data only (vanilla quest unchanged). |
-| `debugFirstRestDream` | Log/toast first-rest dream; F9 forces encounter indoors. |
+| `debugFirstRestDream` | Log/toast first-rest dream (`[corprus_plague] dream:`); F9 forces encounter indoors. |
 
 ## Console
+
+First-rest nightmare journal: `journal cp_carrier 10` (sets the journal entry and enables Wise Woman topic dialogue).
 
 Main-quest cure trigger: `journal C3_DestroyDagoth, 50`
 

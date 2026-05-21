@@ -12,13 +12,11 @@ local DREAM_MESSAGE = table.concat({
     'as though it was not a dream at all.\n\n',
     'A tall figure with a golden mask leads you down the gangplank at Seyda Neen introducing you ',
     'to each Imperial officer as though you are a royal guest.\n\n',
-    'You are asked many questions, you smile and answer graciously.\n\n',
-    'You stand tall, arms extended wide, you open your mouth to speak, an ash cloud erupts from ',
-    'your open mouth.\n\n',
-    "The tall figure watches approvingly, you can't see their lips but you know that they are ",
-    'smiling. You smile back through bared teeth, eyes wide with the excitement of a jungle cat ',
-    'on the hunt.\n\n',
-    "They are a friend. They are a rival. You are each other's willing prey.",
+    'You are asked many questions, and want to answer graciously. You stand tall and begin ',
+    'to speak, but your words become ashes in your mouth, before spilling out into the air, ',
+    'sending your hosts running for their lives.\n\n',
+    'The tall figure watches approvingly, as the ash cloud swirls and dances at his delight. ',
+    'You meet their gaze, your face locked in a rictus grin.',
 })
 
 local CREATURE_ID = 'corprus_stalker'
@@ -122,6 +120,15 @@ function M.trigger(data)
     end
 
     storageApi.markFirstRestDreamTriggered()
+    pcall(function()
+        local types = require('openmw.types')
+        local player = world.players[1]
+        if player and player:isValid() then
+            local quests = types.Player.quests(player)
+            quests[config.carrierJournalId]:addJournalEntry(config.carrierJournalNightmareStage)
+            debug.log('journal ' .. config.carrierJournalId .. ' ' .. config.carrierJournalNightmareStage)
+        end
+    end)
     showDreamMessage()
     debug.log('success')
 end
