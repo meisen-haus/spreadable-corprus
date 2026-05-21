@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Builds corprus_plague_dialogue.omwaddon (1× GLOB + 1× DIAL + 11× INFO per design).
+ * Builds corprus_plague_dialogue.omwaddon (1× GLOB + 1× DIAL + 12× INFO (6 per class × 2 classes)).
  * Single topic "strange nightmare": Choice branches + global-staged fallbacks + Goodbye.
  * See dialogue/WISE_WOMAN_IMPLEMENTATION_PLAN.md
  */
@@ -22,10 +22,11 @@ const WISE_WOMAN_CLASSES = [
 // OpenMW ESM::DialogueCondition::Function_Choice = 49
 const FUNCTION_CHOICE = 49;
 
-// OpenMW passes the BNAM Choice index to Function_Choice (0 for a single-button prompt).
-const CHOICE_BUTTON = 0;
+// Non-zero choice indices so that the uninitialized Function_Choice default (0)
+// does not collide with any choice condition — ROOT (no choice filter) matches first.
+const CHOICE_SHARMAT = 1;
+const CHOICE_WHAT_CAN_I_DO = 2;
 
-// Both branch clicks use choice 0; global 1 vs 2 disambiguates Sharmat vs What can I do.
 // Filter order (first match wins): CH2, CH1, G3, G2, REPEAT, ROOT.
 const OPENING_TEXT =
   'You have become a tool for the devil of Red Mountain. A vessel for his grotesquery. You bring doom to this island.';
@@ -39,7 +40,7 @@ const INFO_LINES = [
       'Throw yourself into the sea, and free yourself from his puppetry. Every day you delay, you murder our people.',
     conditions: [
       { type: 'global', operator: '0', value: 2 },
-      { type: 'choice', value: CHOICE_BUTTON },
+      { type: 'choice', value: CHOICE_WHAT_CAN_I_DO },
     ],
     resultScript: `set ${GLOBAL} to 4\nGoodbye`,
   },
@@ -51,9 +52,9 @@ const INFO_LINES = [
       'The bastard devil of Red Mountain. With his machinations, he has reached a clawed hand beyond the Ghostfence to spread his malice and his plague. And now you are the bringer of this evil.',
     conditions: [
       { type: 'global', operator: '0', value: 1 },
-      { type: 'choice', value: CHOICE_BUTTON },
+      { type: 'choice', value: CHOICE_SHARMAT },
     ],
-    resultScript: `set ${GLOBAL} to 2\nChoice "What can I do?" ${CHOICE_BUTTON}`,
+    resultScript: `set ${GLOBAL} to 2\nChoice "What can I do?" ${CHOICE_WHAT_CAN_I_DO}`,
   },
   {
     id: 'CP_SN_G3',
@@ -71,7 +72,7 @@ const INFO_LINES = [
     text:
       'The bastard devil of Red Mountain. With his machinations, he has reached a clawed hand beyond the Ghostfence to spread his malice and his plague. And now you are the bringer of this evil.',
     conditions: [{ type: 'global', operator: '0', value: 2 }],
-    resultScript: `Choice "What can I do?" ${CHOICE_BUTTON}`,
+    resultScript: `Choice "What can I do?" ${CHOICE_WHAT_CAN_I_DO}`,
   },
   {
     id: 'CP_SN_REPEAT',
@@ -79,7 +80,7 @@ const INFO_LINES = [
     nextId: 'CP_SN_ROOT',
     text: OPENING_TEXT,
     conditions: [{ type: 'global', operator: '0', value: 4 }],
-    resultScript: `set ${GLOBAL} to 1\nChoice "Sharmat?" ${CHOICE_BUTTON}`,
+    resultScript: `set ${GLOBAL} to 1\nChoice "Sharmat?" ${CHOICE_SHARMAT}`,
   },
   {
     id: 'CP_SN_ROOT',
@@ -88,7 +89,7 @@ const INFO_LINES = [
     // Avoid bare "Sharmat" — keyword search can turn it into a topic link and steal clicks.
     text: OPENING_TEXT,
     conditions: [{ type: 'global', operator: '0', value: 1 }],
-    resultScript: `Choice "Sharmat?" ${CHOICE_BUTTON}`,
+    resultScript: `Choice "Sharmat?" ${CHOICE_SHARMAT}`,
   },
 ];
 
@@ -244,8 +245,8 @@ if (text.includes('Choice "Sharmat?" 1\nChoice "What can I do?"')) {
   console.error('validation failed: root must only offer Sharmat (not What can I do)');
   process.exit(1);
 }
-if (!text.includes('Choice "Sharmat?" 0')) {
-  console.error('validation failed: missing Choice "Sharmat?" 0');
+if (!text.includes('Choice "Sharmat?" 1')) {
+  console.error('validation failed: missing Choice "Sharmat?" 1');
   process.exit(1);
 }
 
