@@ -4,7 +4,6 @@ local time = require('openmw_aux.time')
 local config = require('scripts.corprus_plague.config')
 local storageApi = require('scripts.corprus_plague.storage')
 local firstRestDream = require('scripts.corprus_plague.first_rest_dream')
-local dreamGlobal = require('scripts.corprus_plague.first_rest_dream_global')
 local debug = require('scripts.corprus_plague.first_rest_debug')
 
 local M = {}
@@ -75,10 +74,6 @@ function M.onPlayerRestCompleted(data)
 end
 
 function M.tick()
-    if dreamGlobal.getStage() >= 1 then
-        dreamGlobal.syncPlayerTopics()
-    end
-
     if storageApi.hasFirstRestDreamTriggered() and not config.debugIgnoreFirstRestDreamSave then
         return
     end

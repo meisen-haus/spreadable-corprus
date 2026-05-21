@@ -2,7 +2,6 @@ local util = require('openmw.util')
 local world = require('openmw.world')
 local config = require('scripts.corprus_plague.config')
 local storageApi = require('scripts.corprus_plague.storage')
-local dreamGlobal = require('scripts.corprus_plague.first_rest_dream_global')
 local spawnCreature = require('scripts.corprus_plague.spawn_creature')
 local debug = require('scripts.corprus_plague.first_rest_debug')
 
@@ -122,7 +121,13 @@ function M.trigger(data)
 
     storageApi.markFirstRestDreamTriggered()
     pcall(function()
-        dreamGlobal.setStage(1)
+        local types = require('openmw.types')
+        local player = world.players[1]
+        if player and player:isValid() then
+            local quests = types.Player.quests(player)
+            quests[config.carrierJournalId]:addJournalEntry(config.carrierJournalNightmareStage)
+            debug.log('journal ' .. config.carrierJournalId .. ' ' .. config.carrierJournalNightmareStage)
+        end
     end)
     showDreamMessage()
     debug.log('success')

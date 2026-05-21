@@ -36,27 +36,10 @@ local sleeperAndHouseNpcIds = {
 return {
     storageSection = 'corprus_plague',
 
-    -- Short global in corprus_plague_dialogue.omwaddon (console: set cp_firstrest_dream to N).
-    firstRestDreamGlobalId = 'cp_firstrest_dream',
-    wiseWomanClassIds = idSet({
-        'wise woman',
-        'wise woman service',
-    }),
-    firstRestDreamTopicIds = {
-        nightmare = 'strange nightmare',
-    },
-    firstRestDreamInfoIds = {
-        root = 'cp_sn_root',
-        rootService = 'cp_sn_roots',
-        sharmatChoice = 'cp_sn_ch1',
-        sharmatChoiceService = 'cp_sn_ch1s',
-        sharmatGlobal = 'cp_sn_g2',
-        sharmatGlobalService = 'cp_sn_g2s',
-        whatCanIDoChoice = 'cp_sn_ch2',
-        whatCanIDoChoiceService = 'cp_sn_ch2s',
-        whatCanIDoGlobal = 'cp_sn_g3',
-        whatCanIDoGlobalService = 'cp_sn_g3s',
-    },
+    -- Journal in corprus_plague_dialogue.omwaddon (console: journal cp_carrier 10).
+    carrierJournalId = 'cp_carrier',
+    carrierJournalNightmareStage = 10,
+    carrierJournalCureStage = 100,
 
     carrierSpellId = 'corprus_plague_pandemic',
     carrierSpellName = 'Pandemic',
@@ -89,7 +72,7 @@ return {
     clearPlagueDataOnLoad = false,
 
     -- First-rest nightmare — development only (see scripts/corprus_plague/first_rest_dream*.lua).
-    debugFirstRestDream = true, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
+    debugFirstRestDream = false, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
     debugIgnoreFirstRestDreamSave = false, -- allow re-trigger on the same save
     debugTriggerDreamOnLoad = false, -- fire nightmare immediately on load
 

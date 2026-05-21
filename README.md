@@ -23,14 +23,14 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod), and enable **`corprus_plague_dialogue.omwaddon`** after `Morrowind.esm`.
 5. Launch the game. On a new or existing save, you should receive the **Pandemic** ability shortly after loading.
 
-OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders. The companion plugin adds **Wise Woman** topic dialogue after the first-rest nightmare (see `dialogue/WISE_WOMAN_IMPLEMENTATION_PLAN.md`).
+OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders. The companion plugin adds a journal entry and **Wise Woman** topic dialogue after the first-rest nightmare.
 
 **Upgrading:** If an older build granted **Spreadable Corprus** (fixed **1 pt** in Magic), load the save once with this version—the legacy ability is removed and **Pandemic** is applied with the correct count. See [CHANGELOG.md](CHANGELOG.md) for save-format and UI details.
 
 ## Main features
 
 - **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and the final pt count stay visible.
-- **First-rest nightmare** — the first interior rest triggers a strange nightmare; **Wise Woman** NPCs can then discuss it via topic dialogue (requires `corprus_plague_dialogue.omwaddon`).
+- **First-rest nightmare** — the first interior rest triggers a strange nightmare and a journal entry; **Wise Woman** NPCs can then discuss it via topic dialogue (requires `corprus_plague_dialogue.omwaddon`).
 - **Airborne infection** — when an NPC greets the player they become infected.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame, with a brief spawn VFX on the new creature.

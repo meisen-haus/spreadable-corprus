@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Wise Woman topic dialogue** — `corprus_plague_dialogue.omwaddon` adds global `cp_firstrest_dream` and a single topic **strange nightmare** with vanilla **Choice** branches (**Sharmat?**, **What can I do?**) for **Wise Woman** / **Wise Woman Service** NPCs (stages 0–4). Rebuild with `node tools/build_dialogue_esp.mjs`.
+- **Wise Woman topic dialogue** — `corprus_plague_dialogue.omwaddon` adds journal `cp_carrier` (stage 10 = nightmare) and a single topic **strange nightmare** with vanilla **Choice** branches (**Sharmat?**, **What can I do?**) for **Wise Woman** / **Wise Woman Service** NPCs, gated by the journal entry. Rebuild with `node tools/build_dialogue_esp.mjs`.
 - Defeating Dagoth Ur (`C3_DestroyDagoth` stage 50) now cures the player carrier curse, stops new infections, shows a cure message, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and its pt count stay unchanged.
 - Save format **version 4** — adds per-save `cured` and `curePending` (pending retries on load and every 5s until cured).
 - Cure debug flags in `config.lua` (`debugCure`, `debugForceCurePendingOnLoad`, `debugSkipCureApplication`); see [DEVELOPING.md](DEVELOPING.md).
