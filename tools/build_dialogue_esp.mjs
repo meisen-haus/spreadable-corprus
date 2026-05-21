@@ -26,13 +26,9 @@ const FUNCTION_CHOICE = 49;
 const CHOICE_BUTTON = 0;
 
 // Both branch clicks use choice 0; global 1 vs 2 disambiguates Sharmat vs What can I do.
-// Filter order (first match wins): CH2, G3, G2, REPEAT, ROOT, CH1.
-// ROOT must be before CH1 so topic selection (no choice / stale choice 0) shows the opening, not Sharmat copy.
+// Filter order (first match wins): CH2, CH1, G3, G2, REPEAT, ROOT.
 const OPENING_TEXT =
   'You have become a tool for the devil of Red Mountain. A vessel for his grotesquery. You bring doom to this island.';
-
-const SHARMAT_TEXT =
-  'The bastard devil of Red Mountain. With his machinations, he has reached a clawed hand beyond the Ghostfence to spread his malice and his plague. And now you are the bringer of this evil.';
 
 const INFO_LINES = [
   {
@@ -48,8 +44,20 @@ const INFO_LINES = [
     resultScript: `set ${GLOBAL} to 4\nGoodbye`,
   },
   {
-    id: 'CP_SN_G3',
+    id: 'CP_SN_CH1',
     prevId: 'CP_SN_CH2',
+    nextId: 'CP_SN_G3',
+    text:
+      'The bastard devil of Red Mountain. With his machinations, he has reached a clawed hand beyond the Ghostfence to spread his malice and his plague. And now you are the bringer of this evil.',
+    conditions: [
+      { type: 'global', operator: '0', value: 1 },
+      { type: 'choice', value: CHOICE_BUTTON },
+    ],
+    resultScript: `set ${GLOBAL} to 2\nChoice "What can I do?" ${CHOICE_BUTTON}`,
+  },
+  {
+    id: 'CP_SN_G3',
+    prevId: 'CP_SN_CH1',
     nextId: 'CP_SN_G2',
     text:
       'Throw yourself into the sea, and free yourself from his puppetry. Every day you delay, you murder our people.',
@@ -76,22 +84,11 @@ const INFO_LINES = [
   {
     id: 'CP_SN_ROOT',
     prevId: 'CP_SN_REPEAT',
-    nextId: 'CP_SN_CH1',
+    nextId: '',
     // Avoid bare "Sharmat" — keyword search can turn it into a topic link and steal clicks.
     text: OPENING_TEXT,
     conditions: [{ type: 'global', operator: '0', value: 1 }],
     resultScript: `Choice "Sharmat?" ${CHOICE_BUTTON}`,
-  },
-  {
-    id: 'CP_SN_CH1',
-    prevId: 'CP_SN_ROOT',
-    nextId: '',
-    text: SHARMAT_TEXT,
-    conditions: [
-      { type: 'global', operator: '0', value: 1 },
-      { type: 'choice', value: CHOICE_BUTTON },
-    ],
-    resultScript: `set ${GLOBAL} to 2\nChoice "What can I do?" ${CHOICE_BUTTON}`,
   },
 ];
 
