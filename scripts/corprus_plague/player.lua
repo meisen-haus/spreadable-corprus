@@ -30,8 +30,62 @@ local trackedUiMode
 
 local REST_MODE = (I.UI.MODE and I.UI.MODE.Rest) or 'Rest'
 
+-- OpenMW briefly switches Rest -> Loading while the rest menu initializes; not a real cancel.
+local function isRestUiFlicker(mode)
+    return mode == 'Loading' or mode == 'LoadingWallpaper'
+end
+
 local function modeIsRest(mode)
     return mode == REST_MODE
+end
+
+local DIALOGUE_MODE = (I.UI.MODE and I.UI.MODE.Dialogue) or 'Dialogue'
+local loggedUiModes = false
+
+local function isDialogueUiMode(mode)
+    if type(mode) ~= 'string' or mode == '' then
+        return false
+    end
+    if mode == DIALOGUE_MODE or mode == 'Dialogue' then
+        return true
+    end
+    return mode:lower():find('dialog', 1, true) ~= nil
+end
+
+local function requestDreamTopicSync(reason, dialogueTarget)
+    debug.log('requestDreamTopicSync: ' .. tostring(reason))
+    local payload = { reason = reason }
+    if dialogueTarget and dialogueTarget.isValid and dialogueTarget:isValid()
+        and types.NPC.objectIsInstance(dialogueTarget)
+    then
+        local record = types.NPC.record(dialogueTarget)
+        payload.npcClass = record and record.class
+        payload.npcId = record and record.id
+    end
+    core.sendGlobalEvent('CorprusPlagueSyncDreamTopics', payload)
+end
+
+local function logDialogueTarget(arg)
+    if not config.debugFirstRestDream then
+        return
+    end
+    if not arg or not (arg.isValid and arg:isValid()) then
+        debug.log('dialogue open: no NPC in UiModeChanged arg')
+        return
+    end
+    if not types.NPC.objectIsInstance(arg) then
+        debug.log('dialogue open: target is not an NPC')
+        return
+    end
+    local record = types.NPC.record(arg)
+    local classId = record and record.class
+    local classOk = classId and config.wiseWomanClassIds[string.lower(classId)] == true
+    debug.logf(
+        'dialogue open: npc=%s class=%s wiseWoman=%s',
+        tostring(record and record.id),
+        tostring(classId),
+        tostring(classOk)
+    )
 end
 
 local function normalizeQuestId(questId)
@@ -44,6 +98,38 @@ end
 local function isCureQuestUpdate(questId, stage)
     return normalizeQuestId(questId) == normalizeQuestId(config.cureQuestId)
         and (tonumber(stage) or 0) >= config.cureQuestStage
+end
+
+local function addDreamTopicsForStage(stage)
+    stage = tonumber(stage) or 0
+    if stage < 1 then
+        debug.log('addDreamTopics: skipped (stage < 1)')
+        return
+    end
+
+    local topics = config.firstRestDreamTopicIds
+    local added = {}
+    local function addOne(topicId)
+        if types.Player and types.Player.addTopic then
+            types.Player.addTopic(self, topicId)
+        elseif self.type and self.type.addTopic then
+            self.type.addTopic(self, topicId)
+        else
+            error('no addTopic API')
+        end
+    end
+
+    local ok, err = pcall(function()
+        if stage >= 1 and stage < 4 then
+            addOne(topics.nightmare)
+            table.insert(added, topics.nightmare)
+        end
+    end)
+    if ok then
+        debug.logf('addDreamTopics: stage=%d added {%s}', stage, table.concat(added, ', '))
+    else
+        debug.log('addDreamTopics failed: ' .. tostring(err))
+    end
 end
 
 local function sendCureRequest()
@@ -227,10 +313,18 @@ local function handleUiModeTransition(oldMode, newMode, arg)
 
     if isRest and not wasRest then
         setRestBedTarget(arg)
-        activeRestSession = beginRestSession()
+        if activeRestSession then
+            debug.log('rest session resumed (after ' .. tostring(oldMode) .. ')')
+        else
+            activeRestSession = beginRestSession()
+        end
     elseif wasRest and not isRest then
-        tryCompleteRestSession()
-        restBedTarget = nil
+        if isRestUiFlicker(newMode) then
+            debug.log('rest UI flicker Rest -> ' .. tostring(newMode) .. ' (keeping session)')
+        else
+            tryCompleteRestSession()
+            restBedTarget = nil
+        end
     end
 
     trackedUiMode = newMode
@@ -238,13 +332,26 @@ end
 
 local function pollRestUiMode()
     local mode = I.UI.getMode()
+    if activeRestSession then
+        noteRestProgress(activeRestSession)
+    end
     if mode == trackedUiMode then
-        if modeIsRest(mode) then
-            noteRestProgress(activeRestSession)
-        end
         return
     end
+    if not loggedUiModes and config.debugFirstRestDream and I.UI.MODE then
+        loggedUiModes = true
+        local names = {}
+        for name, _ in pairs(I.UI.MODE) do
+            table.insert(names, tostring(name))
+        end
+        table.sort(names)
+        debug.logf('I.UI.MODE keys: %s', table.concat(names, ', '))
+        debug.logf('DIALOGUE_MODE constant: %s', tostring(DIALOGUE_MODE))
+    end
     handleUiModeTransition(trackedUiMode, mode, nil)
+    if isDialogueUiMode(mode) then
+        requestDreamTopicSync('pollRestUiMode', nil)
+    end
 end
 
 local function sendTestRestEvent()
@@ -302,6 +409,10 @@ return {
             if key.symbol == 'f9' or key.symbol == 'F9' then
                 sendTestRestEvent()
             end
+            if key.symbol == 'f10' or key.symbol == 'F10' then
+                requestDreamTopicSync('F10', nil)
+                debug.toast('[Corprus] F10 topic sync — close dialogue and talk again')
+            end
         end,
     },
 
@@ -317,6 +428,22 @@ return {
             end
             handleUiModeTransition(oldMode, newMode, data.arg)
             interactiveMessage.onUiModeChanged(newMode)
+            if config.debugFirstRestDream and oldMode ~= newMode then
+                debug.logf('UiModeChanged: %s -> %s', tostring(oldMode), tostring(newMode))
+            end
+            if isDialogueUiMode(oldMode) and not isDialogueUiMode(newMode) then
+                core.sendGlobalEvent('CorprusPlagueFirstRestDreamDialogueClosed', {})
+            end
+            if isDialogueUiMode(newMode) then
+                logDialogueTarget(data.arg)
+                requestDreamTopicSync('UiModeChanged', data.arg)
+            end
+        end,
+
+        CorprusPlagueAddDreamTopics = function(data)
+            local stage = type(data) == 'table' and data.stage or 0
+            debug.logf('CorprusPlagueAddDreamTopics event stage=%s', tostring(stage))
+            addDreamTopicsForStage(stage)
         end,
 
         CorprusPlagueFirstRestDreamMessage = function(data)
@@ -333,6 +460,9 @@ return {
         end,
 
         DialogueResponse = function(data)
+            -- Global script only: first_rest_dream_dialogue uses openmw.world.
+            core.sendGlobalEvent('CorprusPlagueFirstRestDreamDialogue', data)
+
             local actor = data.actor
             if not eligibility.isNpcActor(actor) then
                 return

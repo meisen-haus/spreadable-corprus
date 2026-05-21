@@ -15,21 +15,22 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 1. Install [OpenMW](https://openmw.org/) 0.51+ with a normal Morrowind data setup (base game; Tribunal and Bloodmoon recommended).
 2. Extract this archive so you have a folder (for example `spreadable-corprus`) containing:
    - `corprus_plague.omwscripts`
+   - `corprus_plague_dialogue.omwaddon`
    - `scripts/`
    - `l10n/`
 3. Place that folder on your OpenMW **data path**—for example next to other mods:
    - `...\OpenMW 0.51.0\data\spreadable-corprus\`
-4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod).
+4. Open **OpenMW Launcher** → **Data Files** and enable the folder (same as any content mod), and enable **`corprus_plague_dialogue.omwaddon`** after `Morrowind.esm`.
 5. Launch the game. On a new or existing save, you should receive the **Pandemic** ability shortly after loading.
 
-No ESP or plugin is required. OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders.
+OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders. The companion plugin adds **Wise Woman** topic dialogue after the first-rest nightmare (see `dialogue/WISE_WOMAN_IMPLEMENTATION_PLAN.md`).
 
 **Upgrading:** If an older build granted **Spreadable Corprus** (fixed **1 pt** in Magic), load the save once with this version—the legacy ability is removed and **Pandemic** is applied with the correct count. See [CHANGELOG.md](CHANGELOG.md) for save-format and UI details.
 
 ## Main features
 
 - **Divine Disease Carrier** — player ability; active effect shows **Divine Disease Carrier** with **Pandemic - N pts** for the number of unique NPCs infected in this save. Defeating Dagoth Ur cures the carrier curse, stops new infections, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and the final pt count stay visible.
-- **First-rest nightmare** — the first interior rest triggers a strange nightmare.
+- **First-rest nightmare** — the first interior rest triggers a strange nightmare; **Wise Woman** NPCs can then discuss it via topic dialogue (requires `corprus_plague_dialogue.omwaddon`).
 - **Airborne infection** — when an NPC greets the player they become infected.
 - **Configurable incubation period** — **Settings → Spreadable Corprus → Pandemic → Incubation period (days)**; choose **1–21** days (default **7**). Stored in your save.
 - **Transformation** — after incubation, infected NPCs become Corprus when active in the world; **70%** Stalker / **30%** Lame, with a brief spawn VFX on the new creature.

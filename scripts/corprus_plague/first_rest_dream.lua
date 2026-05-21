@@ -2,6 +2,7 @@ local util = require('openmw.util')
 local world = require('openmw.world')
 local config = require('scripts.corprus_plague.config')
 local storageApi = require('scripts.corprus_plague.storage')
+local dreamGlobal = require('scripts.corprus_plague.first_rest_dream_global')
 local spawnCreature = require('scripts.corprus_plague.spawn_creature')
 local debug = require('scripts.corprus_plague.first_rest_debug')
 
@@ -12,13 +13,11 @@ local DREAM_MESSAGE = table.concat({
     'as though it was not a dream at all.\n\n',
     'A tall figure with a golden mask leads you down the gangplank at Seyda Neen introducing you ',
     'to each Imperial officer as though you are a royal guest.\n\n',
-    'You are asked many questions, you smile and answer graciously.\n\n',
-    'You stand tall, arms extended wide, you open your mouth to speak, an ash cloud erupts from ',
-    'your open mouth.\n\n',
-    "The tall figure watches approvingly, you can't see their lips but you know that they are ",
-    'smiling. You smile back through bared teeth, eyes wide with the excitement of a jungle cat ',
-    'on the hunt.\n\n',
-    "They are a friend. They are a rival. You are each other's willing prey.",
+    'You are asked many questions, and want to answer graciously. You stand tall and begin ',
+    'to speak, but your words become ashes in your mouth, before spilling out into the air, ',
+    'sending your hosts running for their lives.\n\n',
+    'The tall figure watches approvingly, as the ash cloud swirls and dances at his delight. ',
+    'You meet their gaze, your face locked in a rictus grin.',
 })
 
 local CREATURE_ID = 'corprus_stalker'
@@ -122,6 +121,9 @@ function M.trigger(data)
     end
 
     storageApi.markFirstRestDreamTriggered()
+    pcall(function()
+        dreamGlobal.setStage(1)
+    end)
     showDreamMessage()
     debug.log('success')
 end

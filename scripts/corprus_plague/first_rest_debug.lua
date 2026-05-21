@@ -2,9 +2,17 @@ local config = require('scripts.corprus_plague.config')
 
 local M = {}
 
+local LOG_PREFIX = '[corprus_plague] dream: '
+
 function M.log(message)
     if config.debugFirstRestDream and message and message ~= '' then
-        print('[corprus_plague] first rest dream: ' .. message)
+        print(LOG_PREFIX .. message)
+    end
+end
+
+function M.logf(fmt, ...)
+    if config.debugFirstRestDream and fmt and fmt ~= '' then
+        print(LOG_PREFIX .. string.format(fmt, ...))
     end
 end
 

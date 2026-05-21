@@ -12,6 +12,8 @@ end
 local iconTemplate = content.magicEffects.records['corprus']
     or content.magicEffects.records['resistcorprusdisease']
 
+-- cp_firstrest_dream is defined in corprus_plague_dialogue.omwaddon (GLOB, type short).
+
 content.magicEffects.records[config.carrierEffectId] = {
     template = effectTemplate,
     name = config.carrierEffectName,

@@ -7,6 +7,9 @@ local config = require('scripts.corprus_plague.config')
 local disposition = require('scripts.corprus_plague.disposition')
 local settings = require('scripts.corprus_plague.settings')
 local firstRestDreamWatch = require('scripts.corprus_plague.first_rest_dream_watch')
+local dreamGlobal = require('scripts.corprus_plague.first_rest_dream_global')
+local firstRestDreamDialogue = require('scripts.corprus_plague.first_rest_dream_dialogue')
+local dreamDebug = require('scripts.corprus_plague.first_rest_debug')
 local cureDebug = require('scripts.corprus_plague.cure_debug')
 
 settings.registerGroup()
@@ -84,7 +87,24 @@ local function tryFinishPendingCure(reason)
     applyCarrierCure(reason == 'event' or reason == 'load')
 end
 
+local function syncFirstRestDreamGlobal()
+    if storageApi.hasFirstRestDreamTriggered() then
+        dreamGlobal.ensureMinimumStage(1)
+    elseif dreamGlobal.getStage() >= 1 then
+        -- Console testing: global set without nightmare save flag still needs AddTopic.
+        dreamGlobal.syncPlayerTopics()
+    end
+    if config.debugFirstRestDream then
+        dreamDebug.logf(
+            'syncFirstRestDreamGlobal: stage=%d dreamTriggered=%s',
+            dreamGlobal.getStage(),
+            tostring(storageApi.hasFirstRestDreamTriggered())
+        )
+    end
+end
+
 local function onGameReady()
+    syncFirstRestDreamGlobal()
     storageApi.clearAllPendingTransforms()
     tryFinishPendingCure('gameReady')
     ensureAllPlayers()
@@ -99,6 +119,7 @@ return {
     engineHandlers = {
         onNewGame = function()
             storageApi.clearAll()
+            dreamGlobal.setStage(0)
             ensureAllPlayers()
         end,
 
@@ -108,6 +129,7 @@ return {
 
         onLoad = function(savedData)
             storageApi.importFromSave(savedData)
+            syncFirstRestDreamGlobal()
             if config.debugForceCurePendingOnLoad then
                 storageApi.setCurePending(true)
                 cureDebug.log('debugForceCurePendingOnLoad: curePending set')
@@ -190,6 +212,25 @@ return {
 
         CorprusPlagueRestCompleted = function(data)
             firstRestDreamWatch.onPlayerRestCompleted(data)
+        end,
+
+        CorprusPlagueFirstRestDreamDialogue = function(data)
+            firstRestDreamDialogue.onDialogueResponse(data)
+        end,
+
+        CorprusPlagueFirstRestDreamDialogueClosed = function()
+            firstRestDreamDialogue.onDialogueClosed()
+        end,
+
+        CorprusPlagueSyncDreamTopics = function(data)
+            local stage = dreamGlobal.getStage()
+            local npcClass = type(data) == 'table' and data.npcClass or nil
+            dreamDebug.logf('CorprusPlagueSyncDreamTopics: global stage=%d', stage)
+            if stage < 1 then
+                dreamDebug.log('CorprusPlagueSyncDreamTopics: stage < 1, run: set cp_firstrest_dream to 1')
+            end
+            dreamGlobal.syncPlayerTopics()
+            dreamGlobal.logTopicVisibilityDiagnostics(npcClass)
         end,
     },
 }
