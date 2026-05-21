@@ -9,8 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Wise Woman topic dialogue** — `corprus_plague_dialogue.omwaddon` adds global `cp_firstrest_dream` and a single topic **strange nightmare** with vanilla **Choice** branches (**Sharmat?**, **What can I do?**) for **Wise Woman** / **Wise Woman Service** NPCs (stages 0–4). Rebuild with `node tools/build_dialogue_esp.mjs`.
-- Defeating Dagoth Ur (`C3_DestroyDagoth` stage 50) now cures the player carrier curse, stops new infections, shows a cure message, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and its pt count stay unchanged.
+- **`corprus_plague_dialogue.omwaddon`** — companion plugin (rebuild with `node tools/build_dialogue_esp.mjs`):
+  - Journal **`cp_carrier`**: stage **10** (first-rest nightmare, first person) and stage **100** (carrier cured, written when Dagoth Ur is defeated).
+  - Topic **`strange nightmare`**, gated on **`cp_carrier` ≥ 10** unless noted:
+    - **Wise Women** (`wise woman` / `wise woman service`): linear **Choice** flow (**Sharmat?** → **What can I do?**); post-cure response at **`cp_carrier` ≥ 100**.
+    - **Caius Cosades**, **Mehra Milo**, **Hassour Zainsubani** (by NPC record ID): worried / redirect / dream-lore responses.
+    - **Ashlander** faction: directs you to a Wise Woman.
+    - **Sixth House** faction: cult line at stage 10; confused response at stage 100.
+    - **15 named Sleepers Awake victims** (by NPC record ID): cult line at stage 10 and freed response at stage 100, additionally gated on vanilla **`A1_2_AntabolisInformant` ≥ 10** (Dwemer puzzle box returned).
+- Defeating Dagoth Ur (`C3_DestroyDagoth` stage 50) cures the player carrier curse, stops new infections, shows a cure message, writes **`cp_carrier` stage 100**, and changes the active effect to **Divine Disease Carrier (Cured)** while **Pandemic** and its pt count stay unchanged.
 - Save format **version 4** — adds per-save `cured` and `curePending` (pending retries on load and every 5s until cured).
 - Cure debug flags in `config.lua` (`debugCure`, `debugForceCurePendingOnLoad`, `debugSkipCureApplication`); see [DEVELOPING.md](DEVELOPING.md).
 - Cure and first-rest messages use a deferred OK box so opening them while the developer console is open does not crash the game (shows after closing the console, not on reopen).

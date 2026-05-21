@@ -8,6 +8,8 @@ local function idSet(ids)
 end
 
 -- Sleepers Awake victims (UESP: Morrowind:Sleepers_Awake) plus Sixth House faction NPCs.
+-- The 15 mind-controlled Sleeper record IDs below are also listed in tools/build_dialogue_esp.mjs
+-- (SLEEPER_NPC_IDS) for strange-nightmare dialogue; keep both lists in sync when editing.
 local sleeperAndHouseNpcIds = {
     -- Sixth House faction (Category:Morrowind-Factions-Sixth House)
     'dreamer prophet',
@@ -36,27 +38,10 @@ local sleeperAndHouseNpcIds = {
 return {
     storageSection = 'corprus_plague',
 
-    -- Short global in corprus_plague_dialogue.omwaddon (console: set cp_firstrest_dream to N).
-    firstRestDreamGlobalId = 'cp_firstrest_dream',
-    wiseWomanClassIds = idSet({
-        'wise woman',
-        'wise woman service',
-    }),
-    firstRestDreamTopicIds = {
-        nightmare = 'strange nightmare',
-    },
-    firstRestDreamInfoIds = {
-        root = 'cp_sn_root',
-        rootService = 'cp_sn_roots',
-        sharmatChoice = 'cp_sn_ch1',
-        sharmatChoiceService = 'cp_sn_ch1s',
-        sharmatGlobal = 'cp_sn_g2',
-        sharmatGlobalService = 'cp_sn_g2s',
-        whatCanIDoChoice = 'cp_sn_ch2',
-        whatCanIDoChoiceService = 'cp_sn_ch2s',
-        whatCanIDoGlobal = 'cp_sn_g3',
-        whatCanIDoGlobalService = 'cp_sn_g3s',
-    },
+    -- Journal in corprus_plague_dialogue.omwaddon (console: journal cp_carrier 10).
+    carrierJournalId = 'cp_carrier',
+    carrierJournalNightmareStage = 10,
+    carrierJournalCureStage = 100,
 
     carrierSpellId = 'corprus_plague_pandemic',
     carrierSpellName = 'Pandemic',
@@ -68,7 +53,7 @@ return {
     -- Vanilla main quest update when Dagoth Ur is defeated.
     cureQuestId = 'C3_DestroyDagoth',
     cureQuestStage = 50,
-    cureMessage = "Dagoth Ur’s curse has been lifted. You are no longer his Divine Disease carrier, but at what cost to Vvardenfell?",
+    cureMessage = "Dagoth Ur is no more, and the Heart's beating comes to a stop, and with it, the vessel of his vengeance is cleansed. Breathe deep, for every breath is a new victory for Morrowind's Incarnate.",
 
     -- Show "#{sKilledEssential}" when an essential NPC morphs (same text as vanilla death).
     showProphecyOnEssentialMorph = true,
@@ -89,7 +74,7 @@ return {
     clearPlagueDataOnLoad = false,
 
     -- First-rest nightmare — development only (see scripts/corprus_plague/first_rest_dream*.lua).
-    debugFirstRestDream = true, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
+    debugFirstRestDream = false, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
     debugIgnoreFirstRestDreamSave = false, -- allow re-trigger on the same save
     debugTriggerDreamOnLoad = false, -- fire nightmare immediately on load
 
