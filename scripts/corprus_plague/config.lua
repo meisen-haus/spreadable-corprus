@@ -38,10 +38,8 @@ local sleeperAndHouseNpcIds = {
 return {
     storageSection = 'corprus_plague',
 
-    -- Journal in corprus_plague_dialogue.omwaddon (console: journal cp_carrier 10).
-    carrierJournalId = 'cp_carrier',
-    carrierJournalNightmareStage = 10,
-    carrierJournalCureStage = 100,
+    -- false = core pandemic only (no nightmare, journal, cure, dialogue addon needed).
+    enableStory = true,
 
     carrierSpellId = 'corprus_plague_pandemic',
     carrierSpellName = 'Pandemic',
@@ -50,7 +48,13 @@ return {
     carrierCuredEffectId = 'spreadable_corprus_marker_cured',
     carrierCuredEffectName = 'Divine Disease Carrier (Cured)',
 
-    -- Vanilla main quest update when Dagoth Ur is defeated.
+    -- Story mode only (requires corprus_plague_dialogue.omwaddon for journal text).
+    -- Journal console test: journal cp_carrier 10
+    carrierJournalId = 'cp_carrier',
+    carrierJournalNightmareStage = 10,
+    carrierJournalCureStage = 100,
+
+    -- Story mode only: vanilla main quest update when Dagoth Ur is defeated.
     cureQuestId = 'C3_DestroyDagoth',
     cureQuestStage = 50,
     cureMessage = "Dagoth Ur is no more, and the Heart's beating comes to a stop, and with it, the vessel of his vengeance is cleansed. Breathe deep, for every breath is a new victory for Morrowind's Incarnate.",
@@ -73,12 +77,12 @@ return {
     -- Set true for ONE load to wipe bad infection/transform records from earlier tests, then set false.
     clearPlagueDataOnLoad = false,
 
-    -- First-rest nightmare — development only (see scripts/corprus_plague/first_rest_dream*.lua).
+    -- Story mode debug — first-rest nightmare (see scripts/corprus_plague/first_rest_dream*.lua).
     debugFirstRestDream = false, -- openmw.log + optional in-game toasts; F9 forces encounter indoors
     debugIgnoreFirstRestDreamSave = false, -- allow re-trigger on the same save
     debugTriggerDreamOnLoad = false, -- fire nightmare immediately on load
 
-    -- Carrier cure (Dagoth Ur) — development only. See DEVELOPING.md.
+    -- Story mode debug — carrier cure (Dagoth Ur). See DEVELOPING.md.
     debugCure = false, -- log cure flow to openmw.log ([corprus_plague] cure: …)
     debugForceCurePendingOnLoad = false, -- set curePending on every load (smoke-test load retry)
     debugSkipCureApplication = false, -- accept cure events but do not mark cured (fail-state test)
@@ -89,6 +93,9 @@ return {
     spawnVfxMagicEffectIds = { 'corprus', 'blightdisease' },
     spawnVfxId = 'spreadable_corprus_spawn_vfx',
 
+    -- NPC morph targets after incubation. List of { id = '<creature_record_id>', weight = N }.
+    -- Weights are relative (70/30 and 7/3 behave the same). Restart OpenMW after edits.
+    -- Creature IDs must exist in loaded content (vanilla or other plugins).
     transformCreatures = {
         { id = 'corprus_stalker', weight = 70 },
         { id = 'corprus_lame', weight = 30 },

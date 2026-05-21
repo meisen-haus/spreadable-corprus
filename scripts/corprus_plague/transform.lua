@@ -12,21 +12,45 @@ local disableActor = require('scripts.corprus_plague.disable_actor')
 
 local M = {}
 
+local transformCreatures = {}
 local totalWeight = 0
-for _, entry in ipairs(config.transformCreatures) do
-    totalWeight = totalWeight + entry.weight
+
+local function validateTransformCreatures()
+    local source = config.transformCreatures
+    if type(source) ~= 'table' or #source == 0 then
+        error('corprus_plague: transformCreatures must be a non-empty list')
+    end
+
+    for index, entry in ipairs(source) do
+        if type(entry) ~= 'table' then
+            error('corprus_plague: transformCreatures[' .. index .. '] must be a table')
+        end
+        if type(entry.id) ~= 'string' or entry.id == '' then
+            error('corprus_plague: transformCreatures[' .. index .. '].id must be a non-empty string')
+        end
+        if type(entry.weight) ~= 'number' or entry.weight <= 0 then
+            error('corprus_plague: transformCreatures[' .. index .. '].weight must be a positive number')
+        end
+        transformCreatures[index] = {
+            id = string.lower(entry.id),
+            weight = entry.weight,
+        }
+        totalWeight = totalWeight + entry.weight
+    end
 end
+
+validateTransformCreatures()
 
 local function pickCreatureId()
     local roll = math.random() * totalWeight
     local cumulative = 0
-    for _, entry in ipairs(config.transformCreatures) do
+    for _, entry in ipairs(transformCreatures) do
         cumulative = cumulative + entry.weight
         if roll <= cumulative then
             return entry.id
         end
     end
-    return config.transformCreatures[1].id
+    return transformCreatures[1].id
 end
 
 local function safeRemoveCreature(creature)
@@ -94,14 +118,13 @@ function M.tryTransform(actor)
 
         local creatureId = pickCreatureId()
         creature = spawnCreature.create(creatureId, displayName)
-        if not creature or not creature:isValid() then
-            error('failed to create corprus creature')
+        if not creature then
+            error('failed to create creature: ' .. tostring(creatureId))
         end
 
-        creature.enabled = true
-        creature:teleport(cellName, position, { rotation = rotation })
+        creature:teleport(cell, position, { rotation = rotation })
         if not creature:isValid() then
-            error('corprus not in world after teleport')
+            error('creature not in world after teleport: ' .. tostring(creatureId))
         end
 
         spawnVfx.play(creature)
