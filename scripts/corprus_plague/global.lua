@@ -59,6 +59,16 @@ local function applyCarrierCure(showMessage)
 
     syncAllPlayerCarrierStats()
     storageApi.clearCurePending()
+
+    pcall(function()
+        local types = require('openmw.types')
+        local player = world.players[1]
+        if player and player:isValid() then
+            local quests = types.Player.quests(player)
+            quests[config.carrierJournalId]:addJournalEntry(config.carrierJournalCureStage)
+        end
+    end)
+
     cureDebug.log('carrier cured')
 
     if showMessage then
