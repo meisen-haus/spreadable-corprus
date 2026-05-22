@@ -5,15 +5,60 @@ local actorRef = require('scripts.corprus_plague.actor_ref')
 
 local M = {}
 
-local function targetPenalty()
+local function roundDisposition(value)
+    return math.floor(value + 0.5)
+end
+
+local function targetPenalty(modifierOverride)
     local infections = storageApi.getInfectionCount()
     if infections <= 0 then
         return 0
     end
-    return infections * dispositionModifier.getPerInfection()
+    return infections * dispositionModifier.getPerInfection(modifierOverride)
 end
 
-function M.applyInfectionPenalty(actor, player)
+local function recordTemplateBaseline(actor)
+    local record = types.NPC.record(actor.recordId)
+    if record and type(record.baseDisposition) == 'number' then
+        return record.baseDisposition
+    end
+    return nil
+end
+
+-- One-time natural disposition before plague penalty (stored permanently per NPC).
+local function inferInitialBaseline(actor, current, plagueKey, target)
+    local peak = storageApi.getDispositionPeakPenalty(plagueKey)
+    local hasHistory = storageApi.hasDispositionHistory(plagueKey)
+
+    if hasHistory and (peak > 0 or target > 0) then
+        -- At 0: recover using historical peak penalty; otherwise undo the last target we applied.
+        if current <= target then
+            return current + math.max(peak, target)
+        end
+        return current + target
+    end
+
+    local baseline = current
+    local templateBase = recordTemplateBaseline(actor)
+    if templateBase and templateBase > baseline then
+        baseline = templateBase
+    end
+    return baseline
+end
+
+local function ensureBaseline(actor, player, plagueKey, target)
+    local stored = storageApi.getDispositionBaseline(plagueKey)
+    if stored ~= nil then
+        return stored
+    end
+
+    local current = types.NPC.getBaseDisposition(actor, player)
+    local baseline = inferInitialBaseline(actor, current, plagueKey, target)
+    storageApi.setDispositionBaseline(plagueKey, baseline)
+    return baseline
+end
+
+function M.applyInfectionPenalty(actor, player, modifierOverride)
     if not actor or not actor:isValid() or not player or not player:isValid() then
         return
     end
@@ -22,21 +67,19 @@ function M.applyInfectionPenalty(actor, player)
         return
     end
 
-    local target = targetPenalty()
-    local applied = storageApi.getDispositionPenalty(plagueKey)
-    local delta = target - applied
-    if delta == 0 then
+    local target = targetPenalty(modifierOverride)
+    storageApi.raiseDispositionPeakPenalty(plagueKey, target)
+
+    local baseline = ensureBaseline(actor, player, plagueKey, target)
+    if baseline == nil then
         return
     end
 
-    if delta > 0 then
-        local currentBase = types.NPC.getBaseDisposition(actor, player)
-        local reduction = math.min(delta, math.max(0, currentBase))
-        if reduction > 0 then
-            types.NPC.modifyBaseDisposition(actor, player, -reduction)
-        end
-    else
-        types.NPC.modifyBaseDisposition(actor, player, -delta)
+    local desired = math.max(0, roundDisposition(baseline - target))
+    local current = roundDisposition(types.NPC.getBaseDisposition(actor, player))
+
+    if current ~= desired then
+        types.NPC.setBaseDisposition(actor, player, desired)
     end
 
     storageApi.setDispositionPenalty(plagueKey, target)

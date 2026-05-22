@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Disposition penalty** — on dialogue, base disposition is set to `baseline − (Pandemic pts × modifier)` using a one-time stored natural baseline per NPC (`setBaseDisposition`). Lowering the modifier, turning it off, or reducing infections restores disposition on the next greeting/topic instead of stacking or drifting each talk.
+- **In-game disposition modifier** — the modifier is read from player settings storage and passed to the global script on each dialogue (incubation days sync the same way for transforms).
+- **Disposition after carrier cure** — dialogue still updates penalties when the carrier is cured; new infections remain blocked.
+
+### Changed
+
+- Save format **versions 5–7** — adds per-NPC `dispositionBaselines` and `dispositionPeakPenalties`; version 7 drops inflated baselines from earlier saves so they are re-inferred once on load.
+
 ## [0.3.1] - 2026-05-21
 
 ### Fixed

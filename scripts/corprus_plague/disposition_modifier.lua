@@ -1,31 +1,26 @@
 local storage = require('openmw.storage')
 local config = require('scripts.corprus_plague.config')
+local settingsValues = require('scripts.corprus_plague.settings_values')
+local settingsMirror = require('scripts.corprus_plague.settings_mirror')
 
 local M = {}
 
-local function clampModifier(value)
-    if type(value) ~= 'number' then
-        value = tonumber(value)
+function M.getPerInfection(override)
+    if override ~= nil then
+        return settingsValues.resolveDispositionModifier(override)
     end
-    if value == nil then
-        return config.defaultDispositionModifier
-    end
-    value = math.floor(value * 10 + 0.5) / 10
-    if value < config.minDispositionModifier then
-        return config.minDispositionModifier
-    end
-    if value > config.maxDispositionModifier then
-        return config.maxDispositionModifier
-    end
-    return value
-end
 
-function M.getPerInfection()
+    local mirrored = settingsMirror.getDispositionModifier()
+    if mirrored ~= nil then
+        return settingsValues.resolveDispositionModifier(mirrored)
+    end
+
+    -- Fallback if global runs before the player has synced (should not affect normal play).
     local value = storage.globalSection(config.settingsGroupKey):get('dispositionModifier')
     if value == nil then
         return config.defaultDispositionModifier
     end
-    return clampModifier(value)
+    return settingsValues.resolveDispositionModifier(value)
 end
 
 return M

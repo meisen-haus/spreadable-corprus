@@ -8,6 +8,7 @@ local debug = require('scripts.corprus_plague.first_rest_debug')
 local eligibility = require('scripts.corprus_plague.eligibility')
 local actorRef = require('scripts.corprus_plague.actor_ref')
 local settings = require('scripts.corprus_plague.settings')
+local playerSettings = require('scripts.corprus_plague.player_settings')
 local interactiveMessage = require('scripts.corprus_plague.interactive_message')
 
 local time = { hour = 3600 }
@@ -28,6 +29,7 @@ local cureInitialQuestCheckDone = false
 local cureRequestSent = false
 local restBedTarget
 local trackedUiMode
+local settingsSyncedToGlobal = false
 
 local REST_MODE = (I.UI.MODE and I.UI.MODE.Rest) or 'Rest'
 
@@ -342,6 +344,10 @@ end
 return {
     engineHandlers = {
         onFrame = function()
+            if not settingsSyncedToGlobal then
+                settingsSyncedToGlobal = true
+                playerSettings.syncToGlobal()
+            end
             if trackedUiMode == nil then
                 pcall(function()
                     trackedUiMode = I.UI.getMode()
@@ -420,9 +426,12 @@ return {
             if not plagueKey then
                 return
             end
+            local uiSettings = playerSettings.readFromStorage()
+            playerSettings.syncToGlobal()
             core.sendGlobalEvent('CorprusPlagueInfect', {
                 plagueKey = plagueKey,
                 player = selfApi.object,
+                dispositionModifier = uiSettings.dispositionModifier,
             })
         end,
     },
