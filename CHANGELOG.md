@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **First-rest nightmare on rest** — `player.lua` no longer calls `types.Actor.stats()` as a function (OpenMW exposes it as a namespace); health/fatigue use `types.Actor.stats.dynamic` instead, so opening the Rest UI no longer errors and block the nightmare. Rest→Loading UI flicker handling restored so sessions are not dropped when the menu opens.
 - First-rest nightmare no longer triggers on **Wait**—only on actual sleep (bed or HP/fatigue recovery).
 - Removed interior time-advance backup that could fire the nightmare after waiting.
 - Transform spawn uses validated creature IDs with a reliable fallback path for custom morph targets.
