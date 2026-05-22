@@ -1,3 +1,6 @@
+# Release staging / zip output
+dist/
+
 # Environment variables
 .env
 .env.*

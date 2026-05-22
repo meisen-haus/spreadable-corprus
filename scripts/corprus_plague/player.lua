@@ -31,6 +31,11 @@ local trackedUiMode
 
 local REST_MODE = (I.UI.MODE and I.UI.MODE.Rest) or 'Rest'
 
+-- OpenMW briefly switches Rest -> Loading while the rest menu initializes; not a real cancel.
+local function isRestUiFlicker(mode)
+    return mode == 'Loading' or mode == 'LoadingWallpaper'
+end
+
 local function modeIsRest(mode)
     return mode == REST_MODE
 end
@@ -159,6 +164,23 @@ local function noteRestProgress(session)
     end
 end
 
+local function getHealthFatigue(actor)
+    local dynamic = types.Actor.stats and types.Actor.stats.dynamic
+    if not dynamic or not dynamic.health or not dynamic.fatigue then
+        return nil, nil
+    end
+    local okH, health = pcall(function()
+        return dynamic.health(actor)
+    end)
+    local okF, fatigue = pcall(function()
+        return dynamic.fatigue(actor)
+    end)
+    if not okH or not okF or not health or not fatigue then
+        return nil, nil
+    end
+    return health.current, fatigue.current
+end
+
 local function beginRestSession()
     local cell = getInteriorCell()
     if not canPlayerSleep(cell) then
@@ -168,14 +190,14 @@ local function beginRestSession()
 
     debug.log('rest session started in ' .. cell.name .. (isRestingOnBed() and ' (bed)' or ''))
 
-    local stats = types.Actor.stats(selfApi.object)
+    local healthBefore, fatigueBefore = getHealthFatigue(selfApi.object)
     return {
         cellName = cell.name,
         startGameTime = core.getGameTime(),
         sawTimeAdvance = false,
         onBed = isRestingOnBed(),
-        healthBefore = stats.health.current,
-        fatigueBefore = stats.fatigue.current,
+        healthBefore = healthBefore,
+        fatigueBefore = fatigueBefore,
         position = {
             x = self.position.x,
             y = self.position.y,
@@ -203,11 +225,18 @@ local function sessionWasSleep(session)
         return true
     end
 
-    local stats = types.Actor.stats(selfApi.object)
-    if stats.health.current > session.healthBefore + 0.5 then
+    local healthBefore = session.healthBefore
+    local fatigueBefore = session.fatigueBefore
+    if healthBefore == nil or fatigueBefore == nil then
+        -- Stats API unavailable; fall back to time-advance check only.
+        return session.sawTimeAdvance == true
+    end
+
+    local healthNow, fatigueNow = getHealthFatigue(selfApi.object)
+    if healthNow and healthNow > healthBefore + 0.5 then
         return true
     end
-    if stats.fatigue.current > session.fatigueBefore + 0.5 then
+    if fatigueNow and fatigueNow > fatigueBefore + 0.5 then
         return true
     end
     return false
@@ -261,10 +290,18 @@ local function handleUiModeTransition(oldMode, newMode, arg)
 
     if isRest and not wasRest then
         setRestBedTarget(arg)
-        activeRestSession = beginRestSession()
+        if activeRestSession then
+            debug.log('rest session resumed (after ' .. tostring(oldMode) .. ')')
+        else
+            activeRestSession = beginRestSession()
+        end
     elseif wasRest and not isRest then
-        tryCompleteRestSession()
-        restBedTarget = nil
+        if isRestUiFlicker(newMode) then
+            debug.log('rest UI flicker Rest -> ' .. tostring(newMode) .. ' (keeping session)')
+        else
+            tryCompleteRestSession()
+            restBedTarget = nil
+        end
     end
 
     trackedUiMode = newMode

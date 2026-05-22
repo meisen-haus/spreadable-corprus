@@ -26,7 +26,7 @@ After an incubation period (defaults to 7 days but configurable in-game), the ne
 
 OpenMW loads `corprus_plague.omwscripts` automatically from enabled data folders. The core pandemic (infection, transform, Pandemic ability) works with scripts alone.
 
-Rebuild the plugin after editing dialogue: `node tools/build_dialogue_esp.mjs`.
+Rebuild the plugin after editing dialogue: `node tools/build_dialogue_esp.mjs`. Published GitHub releases build and attach the addon plus a full mod zip automatically (see [DEVELOPING.md](DEVELOPING.md#releases)).
 
 **Upgrading:** If an older build granted **Spreadable Corprus** (fixed **1 pt** in Magic), load the save once with this version—the legacy ability is removed and **Pandemic** is applied with the correct count. See [CHANGELOG.md](CHANGELOG.md) for save-format and UI details.
 
