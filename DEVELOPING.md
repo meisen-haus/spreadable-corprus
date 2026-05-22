@@ -17,6 +17,20 @@ Edit `scripts/corprus_plague/config.lua`, then **restart OpenMW** (config is rea
 
 Incubation and disposition defaults are in-game (**Settings → Spreadable Corprus → Pandemic**); bounds are in `config.lua`.
 
+## Releases
+
+Publishing a GitHub **release** runs [`.github/workflows/release.yml`](.github/workflows/release.yml), which:
+
+1. Runs `node tools/build_dialogue_esp.mjs` (validates and writes `corprus_plague_dialogue.omwaddon`).
+2. Zips the install layout (`spreadable-corprus-<tag>.zip`: scripts, l10n, both plugin files, README, CHANGELOG, LICENSE).
+3. Uploads **`corprus_plague_dialogue.omwaddon`** and the zip to the release.
+
+**Cut a release:** merge to `main`, then create a tag (e.g. `0.3.1`) and publish the release on GitHub — do not upload assets manually unless the workflow failed.
+
+**Test the workflow:** Actions → **Release build** → **Run workflow** (uses workflow artifacts, not a GitHub release).
+
+Local build (same as CI): `node tools/build_dialogue_esp.mjs`
+
 ## Logs
 
 `debugCure = true` → `openmw.log`, search `[corprus_plague] cure:` (Windows: `Documents\My Games\OpenMW\openmw.log`).

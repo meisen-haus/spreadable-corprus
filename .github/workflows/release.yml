@@ -1,0 +1,73 @@
+# Build corprus_plague_dialogue.omwaddon and attach release assets when a release is published.
+name: Release build
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name for the zip filename (e.g. 0.3.1). Ignored when triggered by a published release.'
+        required: true
+        default: 'manual'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          check-latest: true
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build dialogue addon
+        run: node tools/build_dialogue_esp.mjs
+
+      - name: Verify addon output
+        run: test -f corprus_plague_dialogue.omwaddon
+
+      - name: Package mod zip
+        run: |
+          VERSION="${{ steps.version.outputs.tag }}"
+          STAGING="dist/spreadable-corprus"
+          ZIP="dist/spreadable-corprus-${VERSION}.zip"
+          mkdir -p "$STAGING"
+          cp corprus_plague.omwscripts corprus_plague_dialogue.omwaddon README.md CHANGELOG.md LICENSE "$STAGING/"
+          cp -r scripts l10n "$STAGING/"
+          mkdir -p dist
+          (cd dist && zip -r "spreadable-corprus-${VERSION}.zip" spreadable-corprus)
+          ls -la dist/
+          test -f "dist/spreadable-corprus-${VERSION}.zip"
+
+      - name: Upload release assets
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            corprus_plague_dialogue.omwaddon
+            dist/spreadable-corprus-${{ steps.version.outputs.tag }}.zip
+
+      - name: Upload workflow artifacts (manual run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spreadable-corprus-${{ steps.version.outputs.tag }}
+          path: |
+            corprus_plague_dialogue.omwaddon
+            dist/spreadable-corprus-${{ steps.version.outputs.tag }}.zip
