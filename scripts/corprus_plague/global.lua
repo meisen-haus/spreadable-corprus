@@ -7,6 +7,7 @@ local config = require('scripts.corprus_plague.config')
 local disposition = require('scripts.corprus_plague.disposition')
 local firstRestDreamWatch = require('scripts.corprus_plague.first_rest_dream_watch')
 local cureDebug = require('scripts.corprus_plague.cure_debug')
+local settingsMirror = require('scripts.corprus_plague.settings_mirror')
 
 local scanAccumulator = 0
 local cureRetryAccumulator = 0
@@ -160,11 +161,13 @@ return {
     },
 
     eventHandlers = {
-        CorprusPlagueInfect = function(data)
-            if storageApi.isCured() then
-                return
+        CorprusPlagueSyncSettings = function(data)
+            if type(data) == 'table' then
+                settingsMirror.set(data)
             end
+        end,
 
+        CorprusPlagueInfect = function(data)
             local plagueKey = data.plagueKey
             if not plagueKey then
                 return
@@ -172,10 +175,18 @@ return {
 
             local actor = actorRef.findActor(plagueKey)
             if actor and actor:isValid() then
-                if transform.infect(actor) then
+                if not storageApi.isCured() and transform.infect(actor) then
                     syncAllPlayerCarrierStats()
                 end
-                disposition.applyInfectionPenalty(actor, data.player or getPrimaryPlayer())
+                disposition.applyInfectionPenalty(
+                    actor,
+                    data.player or getPrimaryPlayer(),
+                    data.dispositionModifier
+                )
+                return
+            end
+
+            if storageApi.isCured() then
                 return
             end
 

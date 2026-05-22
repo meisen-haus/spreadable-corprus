@@ -1,22 +1,19 @@
 local storage = require('openmw.storage')
 local time = require('openmw_aux.time')
 local config = require('scripts.corprus_plague.config')
+local settingsValues = require('scripts.corprus_plague.settings_values')
+local settingsMirror = require('scripts.corprus_plague.settings_mirror')
 
 local M = {}
 
 function M.getDays()
+    local mirrored = settingsMirror.getIncubationDays()
+    if mirrored ~= nil then
+        return settingsValues.resolveIncubationDays(mirrored)
+    end
+
     local days = storage.globalSection(config.settingsGroupKey):get('incubationDays')
-    if type(days) ~= 'number' then
-        return config.defaultIncubationDays
-    end
-    days = math.floor(days)
-    if days < config.minIncubationDays then
-        return config.minIncubationDays
-    end
-    if days > config.maxIncubationDays then
-        return config.maxIncubationDays
-    end
-    return days
+    return settingsValues.resolveIncubationDays(days)
 end
 
 function M.getSeconds()

@@ -1,7 +1,7 @@
 local storage = require('openmw.storage')
 local config = require('scripts.corprus_plague.config')
 
-local SAVE_VERSION = 4
+local SAVE_VERSION = 7
 
 -- Per-save state (round-tripped via global.lua onSave/onLoad). Not in Persistent storage.
 local state = {
@@ -13,6 +13,8 @@ local state = {
     curePending = false,
     countedInfections = {},
     dispositionPenalties = {},
+    dispositionBaselines = {},
+    dispositionPeakPenalties = {},
     stats = {
         infections = 0,
     },
@@ -186,6 +188,73 @@ function M.setDispositionPenalty(plagueKey, penalty)
     state.dispositionPenalties[plagueKey] = penalty
 end
 
+function M.getDispositionBaseline(plagueKey)
+    if not plagueKey then
+        return nil
+    end
+    local baseline = state.dispositionBaselines[plagueKey]
+    if type(baseline) ~= 'number' then
+        return nil
+    end
+    return baseline
+end
+
+function M.setDispositionBaseline(plagueKey, baseline)
+    if not plagueKey then
+        return
+    end
+    if type(baseline) ~= 'number' then
+        state.dispositionBaselines[plagueKey] = nil
+        return
+    end
+    state.dispositionBaselines[plagueKey] = baseline
+end
+
+function M.hasDispositionHistory(plagueKey)
+    if not plagueKey then
+        return false
+    end
+    return state.dispositionBaselines[plagueKey] ~= nil
+        or state.dispositionPenalties[plagueKey] ~= nil
+        or state.dispositionPeakPenalties[plagueKey] ~= nil
+end
+
+-- Upper bound on how much penalty was ever targeted for this NPC (modifier can go down later).
+function M.getDispositionPeakPenalty(plagueKey)
+    if not plagueKey then
+        return 0
+    end
+    local peak = state.dispositionPeakPenalties[plagueKey]
+    if type(peak) ~= 'number' then
+        peak = 0
+    end
+    local penalty = state.dispositionPenalties[plagueKey]
+    if type(penalty) == 'number' and penalty > peak then
+        peak = penalty
+    end
+    return peak
+end
+
+function M.raiseDispositionPeakPenalty(plagueKey, target)
+    if not plagueKey or type(target) ~= 'number' or target <= 0 then
+        return
+    end
+    local peak = M.getDispositionPeakPenalty(plagueKey)
+    if target > peak then
+        state.dispositionPeakPenalties[plagueKey] = target
+    elseif state.dispositionPeakPenalties[plagueKey] == nil and peak > 0 then
+        state.dispositionPeakPenalties[plagueKey] = peak
+    end
+end
+
+-- Best-effort recovery when saves only recorded a low penalty after lowering the modifier.
+function M.getPandemicDispositionEstimate()
+    if state.stats.infections <= 0 then
+        return 0
+    end
+    return state.stats.infections * config.defaultDispositionModifier
+end
+
 function M.getStats()
     return copyTable(state.stats)
 end
@@ -210,6 +279,8 @@ function M.clearAll()
     state.cured = false
     state.curePending = false
     state.dispositionPenalties = {}
+    state.dispositionBaselines = {}
+    state.dispositionPeakPenalties = {}
     resetInfectionStats()
 end
 
@@ -223,6 +294,8 @@ function M.exportForSave()
         curePending = state.curePending,
         countedInfections = copyTable(state.countedInfections),
         dispositionPenalties = copyTable(state.dispositionPenalties),
+        dispositionBaselines = copyTable(state.dispositionBaselines),
+        dispositionPeakPenalties = copyTable(state.dispositionPeakPenalties),
         stats = copyTable(state.stats),
     }
 end
@@ -250,6 +323,19 @@ function M.importFromSave(savedData)
         if savedData.version >= 3 and type(savedData.dispositionPenalties) == 'table' then
             state.dispositionPenalties = copyTable(savedData.dispositionPenalties)
         end
+        -- v7: drop inflated baselines from the re-anchor bug; they are re-captured once per NPC.
+        if savedData.version >= 7 and type(savedData.dispositionBaselines) == 'table' then
+            state.dispositionBaselines = copyTable(savedData.dispositionBaselines)
+        end
+        if savedData.version >= 6 and type(savedData.dispositionPeakPenalties) == 'table' then
+            state.dispositionPeakPenalties = copyTable(savedData.dispositionPeakPenalties)
+        elseif savedData.version >= 3 and type(savedData.dispositionPenalties) == 'table' then
+            for plagueKey, penalty in pairs(savedData.dispositionPenalties) do
+                if type(penalty) == 'number' and penalty > 0 then
+                    state.dispositionPeakPenalties[plagueKey] = penalty
+                end
+            end
+        end
 
         if savedData.version >= 4 then
             state.cured = savedData.cured == true
@@ -266,6 +352,16 @@ function M.importFromSave(savedData)
         end
 
         state.firstRestDreamTriggered = savedData.firstRestDreamTriggered == true
+
+        local estimate = M.getPandemicDispositionEstimate()
+        if estimate > 0 then
+            for plagueKey in pairs(state.dispositionPenalties) do
+                M.raiseDispositionPeakPenalty(plagueKey, estimate)
+            end
+            for plagueKey in pairs(state.dispositionBaselines) do
+                M.raiseDispositionPeakPenalty(plagueKey, estimate)
+            end
+        end
     end
 end
 
